@@ -392,6 +392,16 @@ async function createProductPage(productId, productData) {
 }
 
 function generateProductPageHTML(productId, productData, slug) {
+    // Determinar la URL de la imagen principal
+    let imagenUrl = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+    
+    // Si hay imágenes subidas, usar la primera
+    if (productData.imagenes && productData.imagenes.length > 0) {
+        imagenUrl = '../' + productData.imagenes[0].url;
+    } else if (productData.imagen_principal) {
+        imagenUrl = '../' + productData.imagen_principal;
+    }
+    
     return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -622,7 +632,7 @@ function generateProductPageHTML(productId, productData, slug) {
         <div class="container">
             <div class="nav-left">
                 <div class="logo">
-                    <a href="../index.html">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
                         <h1 class="logo-text">Hai Swimwear</h1>
                     </a>
                 </div>
@@ -630,7 +640,7 @@ function generateProductPageHTML(productId, productData, slug) {
             <div class="nav-center">
                 <ul class="nav-links">
                     <li><a href="../index.html#inicio">Inicio</a></li>
-                    <li><a href="../index.html#productos">Productos</a></li>
+                    <li><a href="../productos.html">Productos</a></li>
                     <li><a href="../index.html#colecciones">Colecciones</a></li>
                     <li><a href="../index.html#tallas">Guía de Tallas</a></li>
                     <li><a href="../index.html#contacto">Contacto</a></li>
@@ -650,6 +660,16 @@ function generateProductPageHTML(productId, productData, slug) {
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <path d="M16 10a4 4 0 0 1-8 0"></path>
                     </svg>
+                    <a href="../login.php" class="nav-icon-link" title="Panel de Administración">
+                        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                    <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 2v2M15 2v2M9 20v2M15 20v2M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -658,13 +678,13 @@ function generateProductPageHTML(productId, productData, slug) {
     <!-- Product Detail -->
     <div class="product-detail-container">
         <div class="breadcrumb">
-            <a href="../index.html">Home</a> / <a href="../index.html#productos">Productos</a> / <span>${productData.nombre}</span>
+            <a href="../index.html">Home</a> / <a href="../productos.html">Productos</a> / <span>${productData.nombre}</span>
         </div>
         
         <div class="product-detail-grid">
             <div class="product-images">
                 <div class="main-product-image">
-                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="${productData.nombre}" id="mainProductImage">
+                    <img src="${imagenUrl}" alt="${productData.nombre}" id="mainProductImage" onerror="this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">
                 </div>
             </div>
             
@@ -774,16 +794,6 @@ function generateProductPageHTML(productId, productData, slug) {
             const message = encodeURIComponent('Hola! Estoy interesado/a en el producto: ${productData.nombre}');
             window.open('https://wa.me/56912345678?text=' + message, '_blank');
         }
-        
-        // Cargar imagen del producto desde la API
-        fetch('../api.php?action=productos&id=${productId}')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data.imagen_principal) {
-                    document.getElementById('mainProductImage').src = data.data.imagen_principal;
-                }
-            })
-            .catch(error => console.error('Error loading product image:', error));
     </script>
 </body>
 </html>`;
