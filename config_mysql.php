@@ -5,11 +5,11 @@
  */
 
 // Configuración de MySQL/MariaDB
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'hai_swimwear');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_PORT', '3306');
+define('DB_HOST', 'localhost');      // Cambiar por el host de tu base de datos (ej. 127.0.0.1 o IP del servidor)
+define('DB_NAME', 'hai_swimwear');   // Cambiar por el nombre de tu base de datos
+define('DB_USER', 'root');           // Cambiar por tu usuario de MySQL
+define('DB_PASS', '');               // Cambiar por tu contraseña de MySQL
+define('DB_PORT', '3306');           // Cambiar si usas un puerto diferente
 
 // Configuración de la aplicación
 define('APP_NAME', 'Hai Swimwear');

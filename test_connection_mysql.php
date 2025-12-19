@@ -4,7 +4,7 @@
  * Hai Swimwear
  */
 
-require_once '../database/config_mysql.php';
+require_once __DIR__ . '/config_mysql.php';
 
 ?>
 <!DOCTYPE html>

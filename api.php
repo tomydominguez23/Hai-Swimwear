@@ -23,37 +23,86 @@ ini_set('log_errors', 1);
 
 // Prioridad: MySQL > Supabase > PostgreSQL
 $configLoaded = false;
-if (file_exists('../database/config_mysql.php')) {
-    try {
-        require_once '../database/config_mysql.php';
-        $isPostgres = false;
-        $configLoaded = true;
-    } catch (Exception $e) {
-        error_log("Error cargando config_mysql.php: " . $e->getMessage());
+
+// Definir posibles rutas de configuración
+$configPaths = [
+    'mysql' => [
+        __DIR__ . '/config_mysql.php', 
+        __DIR__ . '/../database/config_mysql.php'
+    ],
+    'supabase' => [
+        __DIR__ . '/config_supabase.php', 
+        __DIR__ . '/../database/config_supabase.php'
+    ],
+    'postgresql' => [
+        __DIR__ . '/config_postgresql.php', 
+        __DIR__ . '/../database/config_postgresql.php'
+    ],
+    'default' => [
+        __DIR__ . '/config.php', 
+        __DIR__ . '/../database/config.php'
+    ]
+];
+
+// Intentar cargar configuración MySQL
+foreach ($configPaths['mysql'] as $path) {
+    if (file_exists($path)) {
+        try {
+            require_once $path;
+            $isPostgres = false;
+            $configLoaded = true;
+            break;
+        } catch (Exception $e) {
+            error_log("Error cargando config_mysql.php: " . $e->getMessage());
+        }
     }
-} elseif (file_exists('../database/config_supabase.php')) {
-    try {
-        require_once '../database/config_supabase.php';
-        $isPostgres = true;
-        $configLoaded = true;
-    } catch (Exception $e) {
-        error_log("Error cargando config_supabase.php: " . $e->getMessage());
+}
+
+if (!$configLoaded) {
+    // Intentar cargar configuración Supabase
+    foreach ($configPaths['supabase'] as $path) {
+        if (file_exists($path)) {
+            try {
+                require_once $path;
+                $isPostgres = true;
+                $configLoaded = true;
+                break;
+            } catch (Exception $e) {
+                error_log("Error cargando config_supabase.php: " . $e->getMessage());
+            }
+        }
     }
-} elseif (file_exists('../database/config_postgresql.php')) {
-    try {
-        require_once '../database/config_postgresql.php';
-        $isPostgres = true;
-        $configLoaded = true;
-    } catch (Exception $e) {
-        error_log("Error cargando config_postgresql.php: " . $e->getMessage());
+}
+
+if (!$configLoaded) {
+    // Intentar cargar configuración PostgreSQL
+    foreach ($configPaths['postgresql'] as $path) {
+        if (file_exists($path)) {
+            try {
+                require_once $path;
+                $isPostgres = true;
+                $configLoaded = true;
+                break;
+            } catch (Exception $e) {
+                error_log("Error cargando config_postgresql.php: " . $e->getMessage());
+            }
+        }
     }
-} else {
-    try {
-        require_once '../database/config.php';
-        $isPostgres = false;
-        $configLoaded = true;
-    } catch (Exception $e) {
-        error_log("Error cargando config.php: " . $e->getMessage());
+}
+
+if (!$configLoaded) {
+    // Intentar cargar configuración por defecto
+    foreach ($configPaths['default'] as $path) {
+        if (file_exists($path)) {
+            try {
+                require_once $path;
+                $isPostgres = false;
+                $configLoaded = true;
+                break;
+            } catch (Exception $e) {
+                error_log("Error cargando config.php: " . $e->getMessage());
+            }
+        }
     }
 }
 
