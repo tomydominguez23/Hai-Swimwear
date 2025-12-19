@@ -1,20 +1,21 @@
 <?php
 /**
- * Configuración de conexión a MySQL/MariaDB
+ * Configuración de conexión a MySQL/MariaDB para Producción
  * Hai Swimwear
  */
 
-// Configuración de MySQL/MariaDB
-define('DB_HOST', 'localhost');      // Cambiar por el host de tu base de datos (ej. 127.0.0.1 o IP del servidor)
-define('DB_NAME', 'hai_swimwear');   // Cambiar por el nombre de tu base de datos
-define('DB_USER', 'root');           // Cambiar por tu usuario de MySQL
-define('DB_PASS', '');               // Cambiar por tu contraseña de MySQL
-define('DB_PORT', '3306');           // Cambiar si usas un puerto diferente
+// Configuración de MySQL/MariaDB - PRODUCCIÓN
+define('DB_HOST', 'localhost'); // En cPanel suele ser localhost
+define('DB_NAME', 'haiswimw_paginanueva');
+define('DB_USER', 'haiswimw_Tomas');
+define('DB_PASS', 'yWFbfAj#;i[4');
+define('DB_PORT', '3306');
+define('DB_CHARSET', 'utf8mb4');
 
 // Configuración de la aplicación
 define('APP_NAME', 'Hai Swimwear');
-define('APP_URL', 'http://localhost');
-define('ADMIN_PATH', '/admin');
+define('APP_URL', 'https://haiswimwear.com'); // Ajustar si es necesario
+define('ADMIN_PATH', '/admin'); // Ajustar si la carpeta admin está en otro lado
 
 // Configuración de sesión
 define('SESSION_LIFETIME', 3600); // 1 hora
@@ -44,7 +45,7 @@ class Database {
             $dsn = "mysql:host=" . DB_HOST . 
                    ";port=" . DB_PORT . 
                    ";dbname=" . DB_NAME . 
-                   ";charset=utf8mb4";
+                   ";charset=" . DB_CHARSET;
             
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -55,8 +56,9 @@ class Database {
             
             $this->conn = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch(PDOException $e) {
+            // En producción no mostramos el error detallado al usuario
             error_log("Error de conexión a MySQL: " . $e->getMessage());
-            die("Error de conexión a la base de datos. Por favor, verifica tu configuración.");
+            die("Error de conexión a la base de datos. Por favor, inténtelo más tarde.");
         }
     }
     
@@ -99,7 +101,6 @@ function executeQuery($sql, $params = []) {
     } catch(PDOException $e) {
         error_log("Error en consulta: " . $e->getMessage());
         error_log("SQL: " . $sql);
-        error_log("Params: " . print_r($params, true));
         return false;
     }
 }
@@ -131,7 +132,6 @@ function insertAndGetId($sql, $params = []) {
         return $db->lastInsertId();
     } catch(PDOException $e) {
         error_log("Error al insertar: " . $e->getMessage());
-        error_log("SQL: " . $sql);
         return false;
     }
 }
@@ -263,28 +263,4 @@ function verifyPassword($password, $hash) {
 function hashPassword($password) {
     return password_hash($password, PASSWORD_BCRYPT);
 }
-
-/**
- * Probar conexión a MySQL
- */
-function testConnection() {
-    try {
-        $db = getDB();
-        $result = fetchOne("SELECT VERSION() as version");
-        return [
-            'success' => true,
-            'message' => 'Conexión exitosa a MySQL',
-            'version' => $result['version'] ?? 'Desconocida'
-        ];
-    } catch(Exception $e) {
-        return [
-            'success' => false,
-            'message' => 'Error de conexión: ' . $e->getMessage()
-        ];
-    }
-}
-
 ?>
-
-
-

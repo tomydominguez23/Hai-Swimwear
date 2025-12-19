@@ -1,0 +1,41 @@
+name: 🚀 Despliegue Automático (FTP)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: 🎉 Desplegar a Hosting
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Obtener el código más reciente
+      uses: actions/checkout@v4
+
+    # 1. Preparamos el archivo de configuración para producción
+    # Renombramos config_produccion.php a config_mysql.php ANTES de subir
+    # Esto "engaña" al sistema para subir la config real pisando la local
+    - name: ⚙️ Preparar configuración de producción
+      run: |
+        mv config_produccion.php config_mysql.php
+
+    # 2. Subimos todo al hosting
+    - name: 📂 Sincronizar archivos vía FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # server-dir: /public_html/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          **/node_modules/**
+          **/tests/**
+          README.md
+          *.md
+          *.sql
+          config.php.example
+          # NO excluimos config_mysql.php porque ahora contiene los datos de producción

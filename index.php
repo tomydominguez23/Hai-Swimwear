@@ -4,7 +4,30 @@
  * Hai Swimwear
  */
 
-require_once '../database/config_supabase.php';
+// Intentar cargar configuración (MySQL > Supabase > PostgreSQL > Default)
+$configLoaded = false;
+$configPaths = [
+    __DIR__ . '/config_mysql.php',
+    __DIR__ . '/../database/config_mysql.php',
+    __DIR__ . '/config_supabase.php',
+    __DIR__ . '/../database/config_supabase.php',
+    __DIR__ . '/config_postgresql.php',
+    __DIR__ . '/../database/config_postgresql.php',
+    __DIR__ . '/config.php',
+    __DIR__ . '/../database/config.php'
+];
+
+foreach ($configPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $configLoaded = true;
+        break;
+    }
+}
+
+if (!$configLoaded) {
+    die("Error: No se encontró ningún archivo de configuración de base de datos.");
+}
 
 // Verificar autenticación
 requireAuth();
