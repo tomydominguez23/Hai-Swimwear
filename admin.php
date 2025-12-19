@@ -197,7 +197,7 @@ if (!isAuthenticated()) {
         <?php include 'modals.php'; ?>
     </main>
 
-    <script src="script.js"></script>
+    <script src="admin-script.js"></script>
     <script>
         // Verificar que la API funciona al cargar
         async function testAPI() {
@@ -223,9 +223,4 @@ if (!isAuthenticated()) {
     </script>
 </body>
 </html>
-
-<?php
-// Incluir el contenido del panel (similar a index.html pero adaptado)
-// Por ahora, usaremos el HTML existente con JavaScript que carga desde la API
-?>
 
