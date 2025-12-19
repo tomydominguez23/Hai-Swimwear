@@ -186,13 +186,16 @@ try {
         case 'create_product_page':
             handleCreateProductPage($method);
             break;
+        case 'upload_product_images':
+            handleUploadProductImages($method);
+            break;
         default:
             http_response_code(400);
             echo json_encode([
                 'success' => false,
                 'message' => 'Acción no válida',
                 'action' => $action,
-                'available_actions' => ['test', 'productos', 'pedidos', 'clientes', 'mensajes', 'cotizaciones', 'imagenes', 'stats', 'create_product_page']
+                'available_actions' => ['test', 'productos', 'pedidos', 'clientes', 'mensajes', 'cotizaciones', 'imagenes', 'stats', 'create_product_page', 'upload_product_images']
             ], JSON_UNESCAPED_UNICODE);
             exit;
     }
@@ -630,6 +633,118 @@ function handleCreateProductPage($method) {
         ]);
     } else {
         jsonResponse(false, 'Error al crear archivo de página', null);
+    }
+}
+
+function handleUploadProductImages($method) {
+    global $isPostgres;
+    
+    if ($method !== 'POST') {
+        http_response_code(405);
+        jsonResponse(false, 'Método no permitido', null);
+    }
+    
+    // Validar que se recibió el product_id
+    if (!isset($_POST['product_id'])) {
+        jsonResponse(false, 'ID de producto no especificado', null);
+    }
+    
+    $productId = $_POST['product_id'];
+    
+    // Validar que se recibieron imágenes
+    if (!isset($_FILES['imagenes']) || empty($_FILES['imagenes']['name'][0])) {
+        jsonResponse(false, 'No se recibieron imágenes', null);
+    }
+    
+    // Crear directorio de uploads si no existe
+    $uploadDir = __DIR__ . '/uploads/productos/';
+    if (!file_exists($uploadDir)) {
+        if (!mkdir($uploadDir, 0755, true)) {
+            jsonResponse(false, 'Error al crear directorio de uploads', null);
+        }
+    }
+    
+    $uploadedImages = [];
+    $errors = [];
+    
+    // Procesar cada imagen
+    $fileCount = count($_FILES['imagenes']['name']);
+    for ($i = 0; $i < $fileCount; $i++) {
+        // Saltar si no hay archivo en esta posición
+        if (empty($_FILES['imagenes']['name'][$i])) {
+            continue;
+        }
+        
+        // Validar tipo de archivo
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $fileType = $_FILES['imagenes']['type'][$i];
+        
+        if (!in_array($fileType, $allowedTypes)) {
+            $errors[] = "Archivo {$_FILES['imagenes']['name'][$i]}: tipo no permitido";
+            continue;
+        }
+        
+        // Validar tamaño (máximo 5MB)
+        $maxSize = 5 * 1024 * 1024;
+        if ($_FILES['imagenes']['size'][$i] > $maxSize) {
+            $errors[] = "Archivo {$_FILES['imagenes']['name'][$i]}: demasiado grande (máx 5MB)";
+            continue;
+        }
+        
+        // Generar nombre único
+        $extension = pathinfo($_FILES['imagenes']['name'][$i], PATHINFO_EXTENSION);
+        $fileName = 'producto_' . $productId . '_' . uniqid() . '.' . $extension;
+        $filePath = $uploadDir . $fileName;
+        
+        // Mover archivo
+        if (move_uploaded_file($_FILES['imagenes']['tmp_name'][$i], $filePath)) {
+            // Guardar en base de datos
+            $url = 'uploads/productos/' . $fileName;
+            $altText = $_POST['alt_text'][$i] ?? $_FILES['imagenes']['name'][$i];
+            $esPrincipal = ($i === 0); // La primera imagen es la principal
+            
+            try {
+                if ($isPostgres) {
+                    $sql = "INSERT INTO producto_imagenes (producto_id, url, alt_text, es_principal, orden) 
+                            VALUES ($1, $2, $3, $4, $5) RETURNING id";
+                } else {
+                    $sql = "INSERT INTO producto_imagenes (producto_id, url, alt_text, es_principal, orden) 
+                            VALUES (?, ?, ?, ?, ?)";
+                }
+                
+                $imageId = insertAndGetId($sql, [
+                    $productId,
+                    $url,
+                    $altText,
+                    $esPrincipal,
+                    $i
+                ]);
+                
+                $uploadedImages[] = [
+                    'id' => $imageId,
+                    'url' => $url,
+                    'alt_text' => $altText,
+                    'es_principal' => $esPrincipal,
+                    'orden' => $i
+                ];
+            } catch (Exception $e) {
+                // Si falla la inserción en BD, eliminar el archivo
+                unlink($filePath);
+                $errors[] = "Error al guardar imagen en BD: " . $e->getMessage();
+            }
+        } else {
+            $errors[] = "Error al subir archivo {$_FILES['imagenes']['name'][$i]}";
+        }
+    }
+    
+    // Responder con resultados
+    if (!empty($uploadedImages)) {
+        jsonResponse(true, 'Imágenes subidas: ' . count($uploadedImages), [
+            'imagenes' => $uploadedImages,
+            'errores' => $errors
+        ]);
+    } else {
+        jsonResponse(false, 'No se pudo subir ninguna imagen', ['errores' => $errors]);
     }
 }
 
