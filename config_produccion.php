@@ -15,7 +15,7 @@ define('DB_CHARSET', 'utf8mb4');
 // Configuración de la aplicación
 define('APP_NAME', 'Hai Swimwear');
 define('APP_URL', 'https://haiswimwear.com'); // Ajustar si es necesario
-define('ADMIN_PATH', '.'); // Ajustar si la carpeta admin está en otro lado
+define('ADMIN_PATH', ''); // Vacío porque estamos en la raíz // Ajustar si la carpeta admin está en otro lado
 
 // Configuración de sesión
 define('SESSION_LIFETIME', 3600); // 1 hora
@@ -165,7 +165,7 @@ function isSuperAdmin() {
  */
 function requireAuth() {
     if (!isAuthenticated()) {
-        header('Location: ' . ADMIN_PATH . '/login.php');
+        header('Location: ' . APP_URL . '/login.php');
         exit;
     }
 }
@@ -176,7 +176,7 @@ function requireAuth() {
 function requireAdmin() {
     requireAuth();
     if (!isAdmin()) {
-        header('Location: ' . ADMIN_PATH . '/admin.php?error=no_permission');
+        header('Location: ' . APP_URL . '/admin.php?error=no_permission');
         exit;
     }
 }
@@ -187,7 +187,7 @@ function requireAdmin() {
 function requireSuperAdmin() {
     requireAuth();
     if (!isSuperAdmin()) {
-        header('Location: ' . ADMIN_PATH . '/admin.php?error=no_permission');
+        header('Location: ' . APP_URL . '/admin.php?error=no_permission');
         exit;
     }
 }

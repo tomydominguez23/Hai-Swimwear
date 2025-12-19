@@ -14,7 +14,7 @@ define('DB_PORT', '3306');           // Cambiar si usas un puerto diferente
 // Configuración de la aplicación
 define('APP_NAME', 'Hai Swimwear');
 define('APP_URL', 'http://localhost');
-define('ADMIN_PATH', '.');
+define('ADMIN_PATH', ''); // Vacío porque estamos en la raíz
 
 // Configuración de sesión
 define('SESSION_LIFETIME', 3600); // 1 hora
