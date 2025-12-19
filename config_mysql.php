@@ -29,6 +29,19 @@ define('UPLOAD_DIR', 'uploads/');
 define('MAX_FILE_SIZE', 5242880); // 5MB
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
+// Configuración de sesión robusta
+$sessionPath = __DIR__ . '/sessions';
+if (!file_exists($sessionPath)) {
+    mkdir($sessionPath, 0755, true);
+}
+ini_set('session.save_path', $sessionPath);
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 3600);
+ini_set('session.cookie_lifetime', 3600);
+// ini_set('session.cookie_secure', 1); // Desactivar en local si no usas HTTPS
+ini_set('session.cookie_httponly', 1);
+
 // Zona horaria
 date_default_timezone_set('America/Santiago');
 
