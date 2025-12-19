@@ -1,0 +1,27 @@
+# Permitir acceso a archivos de imagen
+<Files "*">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Permitir tipos de archivo de imagen
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Prevenir ejecución de scripts
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Headers para cacheo de imágenes
+<IfModule mod_headers.c>
+    Header set Cache-Control "max-age=2592000, public"
+</IfModule>
+
+# Habilitar compresión para imágenes
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>

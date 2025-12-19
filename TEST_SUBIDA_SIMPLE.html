@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Subida de Imágenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+            font-family: monospace;
+        }
+        .error {
+            border-left-color: #f44336;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #preview {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        #preview img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Subida de Imágenes</h1>
+    
+    <div class="test-section">
+        <h2>Paso 1: Verificar que existan productos</h2>
+        <button onclick="verificarProductos()">Verificar Productos</button>
+        <div id="productosResult" class="result" style="display:none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Paso 2: Seleccionar imágenes</h2>
+        <input type="file" id="imageInput" multiple accept="image/*">
+        <div id="preview"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Paso 3: Subir imágenes a un producto</h2>
+        <label>ID del Producto: <input type="number" id="productId" placeholder="Ejemplo: 1"></label>
+        <br><br>
+        <button onclick="subirImagenes()">Subir Imágenes</button>
+        <div id="uploadResult" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'api.php';
+
+        // Preview de imágenes
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+            
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Verificar productos
+        async function verificarProductos() {
+            const resultDiv = document.getElementById('productosResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Cargando productos...';
+            
+            try {
+                const response = await fetch(`${API_URL}?action=productos`);
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    let html = `✅ Se encontraron ${result.data.length} productos:\n\n`;
+                    result.data.slice(0, 5).forEach(p => {
+                        html += `ID: ${p.id} - ${p.nombre}\n`;
+                    });
+                    resultDiv.textContent = html;
+                    
+                    // Auto-llenar el primer ID
+                    document.getElementById('productId').value = result.data[0].id;
+                } else {
+                    resultDiv.textContent = '❌ No hay productos. Crea uno primero en admin.php';
+                    resultDiv.classList.add('error');
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Error: ' + error.message;
+                resultDiv.classList.add('error');
+            }
+        }
+
+        // Subir imágenes
+        async function subirImagenes() {
+            const resultDiv = document.getElementById('uploadResult');
+            const fileInput = document.getElementById('imageInput');
+            const productId = document.getElementById('productId').value;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.classList.remove('error');
+            
+            if (!productId) {
+                resultDiv.textContent = '❌ Por favor ingresa un ID de producto';
+                resultDiv.classList.add('error');
+                return;
+            }
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                resultDiv.textContent = '❌ Por favor selecciona al menos una imagen';
+                resultDiv.classList.add('error');
+                return;
+            }
+            
+            resultDiv.innerHTML = '⏳ Subiendo imágenes...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('product_id', productId);
+                
+                Array.from(fileInput.files).forEach((file, i) => {
+                    formData.append('imagenes[]', file);
+                    formData.append('alt_text[]', file.name);
+                });
+                
+                console.log('📤 Enviando:', fileInput.files.length, 'imagen(es) al producto', productId);
+                
+                const response = await fetch(`${API_URL}?action=upload_product_images`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('📥 Respuesta HTTP:', response.status);
+                
+                const result = await response.json();
+                console.log('📋 Resultado:', result);
+                
+                if (result.success) {
+                    let html = `✅ ${result.data.imagenes.length} imagen(es) subida(s) exitosamente!\n\n`;
+                    result.data.imagenes.forEach(img => {
+                        html += `- ${img.url}\n`;
+                    });
+                    
+                    if (result.data.errores && result.data.errores.length > 0) {
+                        html += '\n⚠️ Advertencias:\n';
+                        result.data.errores.forEach(err => {
+                            html += `- ${err}\n`;
+                        });
+                    }
+                    
+                    resultDiv.textContent = html;
+                    
+                    // Limpiar inputs
+                    fileInput.value = '';
+                    document.getElementById('preview').innerHTML = '';
+                    
+                } else {
+                    resultDiv.textContent = '❌ Error: ' + result.message;
+                    if (result.data && result.data.errores) {
+                        resultDiv.textContent += '\n\n' + result.data.errores.join('\n');
+                    }
+                    resultDiv.classList.add('error');
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Error: ' + error.message;
+                resultDiv.classList.add('error');
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

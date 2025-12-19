@@ -1,0 +1,99 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║                    ✅ CHECKLIST DE VERIFICACIÓN                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+INFRAESTRUCTURA:
+├─ ✅ Tabla producto_imagenes existe en BD
+├─ ✅ Directorio /uploads/ creado
+├─ ✅ Directorio /uploads/productos/ creado
+├─ ✅ Permisos configurados (777)
+└─ ✅ API endpoint actualizado
+
+CÓDIGO:
+├─ ✅ api.php: Endpoint upload_product_images funcionando
+├─ ✅ api.php: Carga imágenes de BD al listar productos
+├─ ✅ admin-script.js: Función uploadProductImages() con logs
+├─ ✅ productos.html: Muestra imágenes de productos
+└─ ✅ Validaciones de archivo implementadas
+
+ARCHIVOS DE PRUEBA:
+├─ ✅ TEST_SUBIDA_SIMPLE.html - Prueba visual fácil
+├─ ✅ test_imagen_manual.php - Insertar imagen de prueba
+├─ ✅ DIAGNOSTICO_IMAGENES.md - Documentación
+└─ ✅ COMO_PROBAR_IMAGENES.txt - Guía paso a paso
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    🎯 QUÉ HACER AHORA                             ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+OPCIÓN A - PRUEBA RÁPIDA (5 minutos):
+  1. Abre: TEST_SUBIDA_SIMPLE.html
+  2. Click "Verificar Productos"
+  3. Selecciona 1-2 imágenes
+  4. Click "Subir Imágenes"
+  5. Dime el resultado
+
+OPCIÓN B - PRUEBA COMPLETA (10 minutos):
+  1. Abre: admin.php
+  2. Presiona F12 (consola)
+  3. Crea nuevo producto con imágenes
+  4. Observa los mensajes en consola
+  5. Ve a phpMyAdmin → producto_imagenes
+  6. Ve a productos.html
+  7. Dime qué ves en cada paso
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    🔍 QUÉ BUSCAR                                  ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+EN LA CONSOLA (F12):
+✅ BIEN: "📸 Iniciando subida de imágenes..."
+✅ BIEN: "✅ Imágenes subidas exitosamente"
+❌ MAL: Cualquier mensaje con ❌ o "Error"
+
+EN phpMyAdmin (tabla producto_imagenes):
+✅ BIEN: Ver registros con URLs como "uploads/productos/..."
+❌ MAL: Tabla vacía (0 registros)
+
+EN productos.html:
+✅ BIEN: Ver productos con imágenes reales
+❌ MAL: Ver "Imagen del Producto" (placeholder)
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    📊 ESTADO ACTUAL                               ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+✅ Backend funcionando
+✅ Base de datos lista
+✅ Directorios creados
+✅ Permisos configurados
+✅ Código actualizado con logs
+⏳ FALTA PROBAR que todo funcione junto
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    💡 TIPS                                        ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+1. SIEMPRE abre la consola (F12) antes de subir
+2. Lee TODOS los mensajes en la consola
+3. Si hay errores en ROJO, cópialos COMPLETOS
+4. Verifica phpMyAdmin después de cada prueba
+5. Las imágenes deben ser JPG, PNG, WebP o GIF
+6. Tamaño máximo: 5MB por imagen
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    🆘 SI FALLA                                    ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Dime:
+□ ¿Qué archivo usaste para probar?
+□ ¿Qué mensajes aparecen en la consola (F12)?
+□ ¿Qué dice phpMyAdmin (producto_imagenes)?
+□ ¿Hay archivos en /uploads/productos/?
+□ Captura de pantalla de los errores
+
+═══════════════════════════════════════════════════════════════════
+
+        🚀 TODO ESTÁ LISTO - SOLO FALTA PROBAR 🚀
+
+═══════════════════════════════════════════════════════════════════

@@ -231,12 +231,48 @@ function handleProductos($method) {
                             WHERE p.id = ?";
                 }
                 $producto = fetchOne($sql, [$id]);
+                
+                // Cargar imágenes del producto
+                if ($producto) {
+                    if ($isPostgres) {
+                        $imagenes = fetchAll(
+                            "SELECT url, alt_text, es_principal, orden FROM producto_imagenes WHERE producto_id = $1 ORDER BY es_principal DESC, orden ASC",
+                            [$producto['id']]
+                        );
+                    } else {
+                        $imagenes = fetchAll(
+                            "SELECT url, alt_text, es_principal, orden FROM producto_imagenes WHERE producto_id = ? ORDER BY es_principal DESC, orden ASC",
+                            [$producto['id']]
+                        );
+                    }
+                    $producto['imagenes'] = $imagenes;
+                    $producto['imagen_principal'] = !empty($imagenes) ? $imagenes[0]['url'] : null;
+                }
+                
                 jsonResponse(true, 'Producto obtenido', $producto);
             } else {
                 $productos = fetchAll("SELECT p.*, c.nombre as categoria_nombre 
                                       FROM productos p 
                                       LEFT JOIN categorias c ON p.categoria_id = c.id 
                                       ORDER BY p.fecha_creacion DESC");
+                
+                // Cargar imágenes para cada producto
+                foreach ($productos as &$producto) {
+                    if ($isPostgres) {
+                        $imagenes = fetchAll(
+                            "SELECT url, alt_text, es_principal, orden FROM producto_imagenes WHERE producto_id = $1 ORDER BY es_principal DESC, orden ASC",
+                            [$producto['id']]
+                        );
+                    } else {
+                        $imagenes = fetchAll(
+                            "SELECT url, alt_text, es_principal, orden FROM producto_imagenes WHERE producto_id = ? ORDER BY es_principal DESC, orden ASC",
+                            [$producto['id']]
+                        );
+                    }
+                    $producto['imagenes'] = $imagenes;
+                    $producto['imagen_principal'] = !empty($imagenes) ? $imagenes[0]['url'] : null;
+                }
+                
                 jsonResponse(true, 'Productos obtenidos', $productos);
             }
             break;

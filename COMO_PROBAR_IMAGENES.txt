@@ -1,0 +1,134 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║        📸 CÓMO PROBAR QUE LAS IMÁGENES FUNCIONEN                  ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+🎯 PASO 1: PRUEBA MANUAL DE BASE DE DATOS
+═══════════════════════════════════════════
+
+1. Abre en tu navegador:
+   → http://tudominio.com/test_imagen_manual.php
+
+2. Este script va a:
+   ✓ Verificar que existan productos
+   ✓ Insertar una imagen de prueba
+   ✓ Mostrarte el resultado
+
+3. Si ves "✓ Imagen de prueba insertada" → La BD funciona ✓
+   Si ves errores → Copia el error y díme
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 PASO 2: PROBAR SUBIDA DESDE EL ADMIN
+═══════════════════════════════════════════
+
+1. Ve al panel admin:
+   → admin.php
+
+2. ANTES de crear el producto:
+   → Presiona F12 (abrir consola del navegador)
+   → Ve a la pestaña "Console"
+
+3. Click en "Nuevo Producto"
+
+4. Llena el formulario:
+   - Nombre: "Test Bikini Imagen"
+   - Precio: 25000
+   - Stock: 5
+   - Categoría: (selecciona una)
+
+5. IMPORTANTE - Seleccionar imágenes:
+   → Click en el área de "Imágenes del Producto"
+   → Selecciona 1 o 2 imágenes de tu computadora
+   → Deben aparecer previsualizaciones debajo
+
+6. Click "Guardar Producto"
+
+7. Observa la consola (F12):
+   - Debe aparecer: "✅ Producto creado exitosamente"
+   - Debe aparecer: "Imágenes subidas exitosamente"
+   - Si hay errores en ROJO, cópialos
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 PASO 3: VERIFICAR EN LA BASE DE DATOS
+═══════════════════════════════════════════
+
+1. Ve a phpMyAdmin
+
+2. Selecciona la base de datos: haiswimw_paginanueva
+
+3. Click en la tabla: producto_imagenes
+
+4. Debe tener al menos 1 registro
+
+5. Si tiene registros:
+   ✓ Verifica que el campo "url" tenga algo como:
+     "uploads/productos/producto_X_123456.jpg"
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 PASO 4: VERIFICAR QUE SE VISUALICEN
+═══════════════════════════════════════════
+
+1. Ve a: productos.html
+
+2. Debes ver el producto "Test Bikini Imagen"
+
+3. Debe tener la imagen que subiste
+
+4. Si NO se ve la imagen:
+   → Abre la consola (F12)
+   → Ve a la pestaña "Network"
+   → Busca la imagen
+   → Ve si da error 404 (no encontrada)
+
+═══════════════════════════════════════════════════════════════════
+
+🔍 VERIFICACIONES ADICIONALES
+═══════════════════════════════════════════
+
+✓ Directorio /uploads/productos/ existe
+✓ Permisos del directorio: 777
+✓ Tabla producto_imagenes existe en la BD
+✓ API endpoint upload_product_images existe
+
+Si sigues estos pasos y me dices en qué paso falla, 
+podré ayudarte a resolver el problema exacto.
+
+═══════════════════════════════════════════════════════════════════
+
+💡 ERRORES COMUNES
+═══════════════════════════════════════════
+
+ERROR: "No se recibieron imágenes"
+→ El formulario no está enviando las imágenes
+→ Verifica que seleccionaste archivos antes de guardar
+
+ERROR: "Error al crear directorio"
+→ Permisos incorrectos
+→ Ejecuta: chmod -R 777 /workspace/uploads
+
+ERROR: "Tipo de archivo no permitido"
+→ Solo se permiten: JPG, PNG, WebP, GIF
+→ Verifica que tu imagen sea uno de estos formatos
+
+ERROR: "Imagen demasiado grande"
+→ Máximo 5MB por imagen
+→ Reduce el tamaño de la imagen
+
+ERROR: "Error al guardar imagen en BD"
+→ Problema con la base de datos
+→ Verifica la conexión en config_mysql.php
+
+═══════════════════════════════════════════════════════════════════
+
+📱 ¿QUÉ DEBO HACER AHORA?
+
+1. Ejecuta test_imagen_manual.php
+2. Dime qué resultado te da
+3. Luego prueba crear un producto con imágenes
+4. Dime si ves errores en la consola (F12)
+
+Con esa información sabré exactamente qué arreglar.
+
+═══════════════════════════════════════════════════════════════════

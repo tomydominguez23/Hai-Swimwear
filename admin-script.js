@@ -320,31 +320,42 @@ async function handleProductSubmit(e) {
 }
 
 async function uploadProductImages(productId, files) {
+    console.log('📸 Iniciando subida de imágenes...');
+    console.log('   - Product ID:', productId);
+    console.log('   - Número de archivos:', files.length);
+    
     try {
         const formData = new FormData();
         formData.append('product_id', productId);
         
         // Agregar todas las imágenes al FormData
         for (let i = 0; i < files.length; i++) {
+            console.log(`   - Archivo ${i + 1}:`, files[i].name, '(', files[i].size, 'bytes)');
             formData.append('imagenes[]', files[i]);
             formData.append('alt_text[]', files[i].name);
         }
+        
+        console.log('📤 Enviando petición a:', `${API_URL}?action=upload_product_images`);
         
         const response = await fetch(`${API_URL}?action=upload_product_images`, {
             method: 'POST',
             body: formData
         });
         
+        console.log('📥 Respuesta recibida:', response.status, response.statusText);
+        
         const result = await response.json();
+        console.log('📋 Resultado:', result);
         
         if (result.success) {
-            console.log('Imágenes subidas exitosamente:', result.data);
+            console.log('✅ Imágenes subidas exitosamente:', result.data);
+            showNotification(`✓ ${result.data.imagenes.length} imagen(es) subida(s) correctamente`, 'success');
         } else {
-            console.error('Error al subir imágenes:', result.message);
-            showNotification('Advertencia: Producto creado pero algunas imágenes no se pudieron subir', 'warning');
+            console.error('❌ Error al subir imágenes:', result.message);
+            showNotification('Advertencia: Producto creado pero algunas imágenes no se pudieron subir: ' + result.message, 'warning');
         }
     } catch (error) {
-        console.error('Error al subir imágenes:', error);
+        console.error('💥 Error al subir imágenes:', error);
         showNotification('Advertencia: Producto creado pero las imágenes no se pudieron subir', 'warning');
     }
 }
