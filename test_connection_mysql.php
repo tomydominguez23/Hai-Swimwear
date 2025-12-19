@@ -4,7 +4,28 @@
  * Hai Swimwear
  */
 
-require_once __DIR__ . '/config_mysql.php';
+// Detectar si estamos en producción (servidor compartido suele tener DOCUMENT_ROOT diferente)
+// Si el archivo config_mysql.php no existe en el directorio actual, intentamos cargarlo relativamente
+if (file_exists('config_mysql.php')) {
+    require_once 'config_mysql.php';
+} elseif (file_exists('../database/config_mysql.php')) {
+    require_once '../database/config_mysql.php';
+} else {
+    // Si no encuentra la configuración, definimos constantes dummy para que no falle fatalmente
+    // y podamos mostrar el error bonito en el HTML
+    define('DB_HOST', 'No encontrado');
+    define('DB_NAME', 'No encontrado');
+    define('DB_USER', 'No encontrado');
+    define('DB_PASS', '');
+    define('DB_PORT', '3306');
+    
+    function testConnection() {
+        return [
+            'success' => false,
+            'message' => 'No se encontró el archivo de configuración config_mysql.php'
+        ];
+    }
+}
 
 ?>
 <!DOCTYPE html>
