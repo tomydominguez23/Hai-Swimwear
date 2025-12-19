@@ -14,7 +14,7 @@ define('DB_PORT', '3306');           // Cambiar si usas un puerto diferente
 // Configuración de la aplicación
 define('APP_NAME', 'Hai Swimwear');
 define('APP_URL', 'http://localhost');
-define('ADMIN_PATH', '/admin');
+define('ADMIN_PATH', '.');
 
 // Configuración de sesión
 define('SESSION_LIFETIME', 3600); // 1 hora
@@ -176,7 +176,7 @@ function requireAuth() {
 function requireAdmin() {
     requireAuth();
     if (!isAdmin()) {
-        header('Location: ' . ADMIN_PATH . '/index.php?error=no_permission');
+        header('Location: ' . ADMIN_PATH . '/admin.php?error=no_permission');
         exit;
     }
 }
@@ -187,7 +187,7 @@ function requireAdmin() {
 function requireSuperAdmin() {
     requireAuth();
     if (!isSuperAdmin()) {
-        header('Location: ' . ADMIN_PATH . '/index.php?error=no_permission');
+        header('Location: ' . ADMIN_PATH . '/admin.php?error=no_permission');
         exit;
     }
 }

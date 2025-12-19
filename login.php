@@ -34,7 +34,7 @@ session_start();
 
 // Si ya está autenticado, redirigir al panel
 if (isAuthenticated()) {
-    header('Location: index.php');
+    header('Location: admin.php');
     exit;
 }
 
@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($email && $password) {
         try {
+            // ... (código existente) ...
             $user = fetchOne("SELECT * FROM usuarios WHERE email = $1 AND activo = true", [$email]);
             
             if ($user) {
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Actualizar último acceso
                     executeQuery("UPDATE usuarios SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id = $1", [$user['id']]);
                     
-                    header('Location: index.php');
+                    header('Location: admin.php');
                     exit;
                 } else {
                     $error = 'Credenciales incorrectas';
