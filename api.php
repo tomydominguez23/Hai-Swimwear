@@ -183,13 +183,16 @@ try {
         case 'stats':
             handleStats();
             break;
+        case 'create_product_page':
+            handleCreateProductPage($method);
+            break;
         default:
             http_response_code(400);
             echo json_encode([
                 'success' => false,
                 'message' => 'Acción no válida',
                 'action' => $action,
-                'available_actions' => ['test', 'productos', 'pedidos', 'clientes', 'mensajes', 'cotizaciones', 'imagenes', 'stats']
+                'available_actions' => ['test', 'productos', 'pedidos', 'clientes', 'mensajes', 'cotizaciones', 'imagenes', 'stats', 'create_product_page']
             ], JSON_UNESCAPED_UNICODE);
             exit;
     }
@@ -594,6 +597,40 @@ function slugify($text) {
     $text = preg_replace('~-+~', '-', $text);
     $text = strtolower($text);
     return $text;
+}
+
+function handleCreateProductPage($method) {
+    if ($method !== 'POST') {
+        http_response_code(405);
+        jsonResponse(false, 'Método no permitido', null);
+    }
+    
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    if (!isset($data['product_id']) || !isset($data['slug']) || !isset($data['html_content'])) {
+        jsonResponse(false, 'Datos incompletos', null);
+    }
+    
+    // Crear directorio de productos si no existe
+    $productsDir = __DIR__ . '/productos';
+    if (!file_exists($productsDir)) {
+        if (!mkdir($productsDir, 0755, true)) {
+            jsonResponse(false, 'Error al crear directorio de productos', null);
+        }
+    }
+    
+    // Crear archivo HTML
+    $filename = $productsDir . '/' . $data['slug'] . '.html';
+    
+    if (file_put_contents($filename, $data['html_content'])) {
+        jsonResponse(true, 'Página de producto creada exitosamente', [
+            'url' => 'productos/' . $data['slug'] . '.html',
+            'slug' => $data['slug'],
+            'product_id' => $data['product_id']
+        ]);
+    } else {
+        jsonResponse(false, 'Error al crear archivo de página', null);
+    }
 }
 
 ?>
