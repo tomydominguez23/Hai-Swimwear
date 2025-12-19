@@ -1,0 +1,32 @@
+<?php
+/**
+ * Archivo de ejemplo de configuración para Supabase
+ * 
+ * INSTRUCCIONES:
+ * 1. Copia este archivo y renómbralo a: config_supabase.php
+ * 2. Completa los datos de tu proyecto Supabase
+ * 3. NO subas config_supabase.php a Git (está en .gitignore)
+ */
+
+// Configuración de Supabase
+// Obtén estos valores desde tu proyecto en Supabase: Settings > Database
+
+// Host de tu base de datos Supabase
+// Formato: db.xxxxxxxxxxxxx.supabase.co
+define('SUPABASE_HOST', 'db.xxxxxxxxxxxxx.supabase.co');
+
+// Nombre de la base de datos (generalmente es 'postgres')
+define('SUPABASE_DB', 'postgres');
+
+// Usuario de la base de datos (generalmente es 'postgres')
+define('SUPABASE_USER', 'postgres');
+
+// Contraseña de tu base de datos Supabase
+// IMPORTANTE: Esta es la contraseña que configuraste al crear el proyecto
+define('SUPABASE_PASS', 'tu_contraseña_aqui');
+
+// Puerto (generalmente es 5432)
+define('SUPABASE_PORT', '5432');
+
+// ... resto del archivo igual ...
+

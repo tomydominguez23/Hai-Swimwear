@@ -1,0 +1,33 @@
+===========================================
+  CÓMO ABRIR LAS PÁGINAS EN LOCAL
+===========================================
+
+OPCIÓN 1: Con XAMPP (Más Fácil)
+--------------------------------
+1. Instala XAMPP desde: https://www.apachefriends.org/
+2. Copia tu proyecto a: C:\xampp\htdocs\Pagina Hai definitiva\
+3. Abre XAMPP y haz clic en "Start" en Apache
+4. Abre tu navegador y ve a:
+
+   http://localhost/Pagina%20Hai%20definitiva/admin/test_connection.php
+   http://localhost/Pagina%20Hai%20definitiva/admin/login.php
+   http://localhost/Pagina%20Hai%20definitiva/admin/index.php
+
+OPCIÓN 2: Con PHP Built-in Server
+-----------------------------------
+1. Abre PowerShell en la carpeta: D:\Pagina Hai definitiva
+2. Ejecuta: php -S localhost:8000
+3. Abre tu navegador y ve a:
+
+   http://localhost:8000/admin/test_connection.php
+   http://localhost:8000/admin/login.php
+   http://localhost:8000/admin/index.php
+
+IMPORTANTE:
+- NO abras los archivos directamente (doble clic)
+- Usa SIEMPRE http://localhost/...
+- Usa index.php, NO index.html
+- Inicia sesión primero en login.php
+
+===========================================
+

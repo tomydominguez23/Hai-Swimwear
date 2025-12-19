@@ -1,0 +1,57 @@
+# Archivos de configuración con credenciales (NO subir)
+database/config_supabase.php
+database/config_postgresql.php
+database/config_mysql.php
+database/config.php
+
+# Archivos temporales y de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Archivos ZIP
+*.zip
+*.rar
+*.7z
+
+# Logs
+*.log
+error_log
+access_log
+
+# Archivos de sesión
+sessions/
+*.session
+
+# Archivos de subida (pueden ser grandes)
+uploads/*
+!uploads/.htaccess
+!uploads/README.md
+
+# Archivos de entorno
+.env
+.env.local
+.env.production
+
+# Archivos de backup
+*.bak
+*.backup
+*.sql.bak
+
+# Node modules (si se agregan en el futuro)
+node_modules/
+package-lock.json
+
+# Archivos de PHP temporales
+*.tmp
+*.cache
+
+# Archivos de configuración local
+config.local.php
+config.local.php.example
+

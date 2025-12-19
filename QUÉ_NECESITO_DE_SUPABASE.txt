@@ -1,0 +1,36 @@
+===========================================
+  QUÉ NECESITO DE SUPABASE - LISTA SIMPLE
+===========================================
+
+1. Ve a: Supabase Dashboard > Settings > Database
+
+2. Necesito estos 5 valores:
+
+   ✅ Host: db.xxxxx.supabase.co
+      (Lo encuentras en "Connection info" o "Connection string")
+   
+   ✅ Database: postgres
+      (Generalmente siempre es "postgres")
+   
+   ✅ User: postgres
+      (Generalmente siempre es "postgres")
+   
+   ✅ Password: tu_contraseña_de_base_de_datos
+      (Lo encuentras en "Database password")
+      ⚠️ NO es la API Key, es la contraseña de la BD
+   
+   ✅ Port: 5432
+      (Generalmente siempre es 5432)
+
+3. Actualiza: database/config_supabase.php
+   con estos valores
+
+4. Ejecuta en Supabase SQL Editor:
+   - database/schema_postgresql.sql (crear tablas)
+   - database/crear_usuario_admin.sql (crear admin)
+   - database/permisos_supabase.sql (dar permisos)
+
+5. Verifica: admin/verificar_que_falta.php
+
+===========================================
+

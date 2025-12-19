@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hai Swimwear | Trajes de Baño para Mujeres con Busto Grande</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Info Bar -->
+    <div class="top-info-bar">
+        <div class="container">
+            <div class="info-left">
+                <span>PAGA EN 12 CUOTAS SIN INTERÉS</span>
+            </div>
+            <div class="info-center">
+                <span>Envío RM a $3.490 y REGIONES a $6.390</span>
+            </div>
+            <div class="info-right">
+                <span>RETIRO EN TIENDA GRATIS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-left">
+                <div class="logo">
+                    <h1 class="logo-text">Hai Swimwear</h1>
+                </div>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#productos">Productos</a></li>
+                    <li><a href="#colecciones">Colecciones</a></li>
+                    <li><a href="#tallas">Guía de Tallas</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="search-bar">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" placeholder="¿Qué buscas?" class="search-input">
+                </div>
+                <div class="nav-icons">
+                    <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <a href="admin/index.html" class="nav-icon-link" title="Panel de Administración">
+                        <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                    <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 2v2M15 2v2M9 20v2M15 20v2M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner Carousel -->
+    <section class="hero-carousel" id="inicio">
+        <div class="carousel-container">
+            <!-- Slide 1 -->
+            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');">
+                <div class="hero-content">
+                    <h2 class="hero-title">Hai Swimwear</h2>
+                    <p class="hero-subtitle">Lanzamiento</p>
+                    <p class="hero-cta">Sé la primera</p>
+                    <button class="cta-button">COMPRAR AHORA</button>
+                </div>
+                <div class="hero-overlay"></div>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');">
+                <div class="hero-content">
+                    <h2 class="hero-title">Hai Swimwear</h2>
+                    <p class="hero-subtitle">Colección Verano</p>
+                    <p class="hero-cta">Diseñado para ti</p>
+                    <button class="cta-button">VER COLECCIÓN</button>
+                </div>
+                <div class="hero-overlay"></div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');">
+                <div class="hero-content">
+                    <h2 class="hero-title">Hai Swimwear</h2>
+                    <p class="hero-subtitle">Soporte Perfecto</p>
+                    <p class="hero-cta">Comodidad y estilo</p>
+                    <button class="cta-button">DESCUBRIR MÁS</button>
+                </div>
+                <div class="hero-overlay"></div>
+            </div>
+        </div>
+        
+        <!-- Carousel Controls -->
+        <button class="carousel-btn carousel-btn-prev" aria-label="Anterior">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <button class="carousel-btn carousel-btn-next" aria-label="Siguiente">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+        
+        <!-- Carousel Indicators -->
+        <div class="carousel-indicators">
+            <button class="indicator active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="indicator" data-slide="1" aria-label="Slide 2"></button>
+            <button class="indicator" data-slide="2" aria-label="Slide 3"></button>
+        </div>
+    </section>
+
+    <!-- Promotional Banner -->
+    <div class="promo-banner">
+        <div class="container">
+            <p>SÉ PARTE DE HAI SWIMWEAR Y OBTÉN UN 10% OFF EN TU PRIMERA COMPRA</p>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <section class="products-section" id="productos">
+        <div class="container">
+            <div class="breadcrumb">
+                <span>Home / Productos / Trajes de Baño</span>
+            </div>
+            
+            <div class="section-header">
+                <h2 class="section-title">Swimwear by HAi</h2>
+                <span class="product-count">(24 Productos)</span>
+            </div>
+
+            <div class="products-layout">
+                <!-- Sidebar Filters -->
+                <aside class="filters-sidebar">
+                    <h3 class="filter-title">Filtros</h3>
+                    
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Género</h4>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" checked>
+                            <span>Mujer</span>
+                        </label>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Tipo</h4>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Bikini</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Bikini Entero</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Traje de Baño</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Bikini Sostén</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Bikini Calzón</span>
+                        </label>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Talla</h4>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>XS</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>S</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>M</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>L</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>XL</span>
+                        </label>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Soporte</h4>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Con Varillas</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Sin Varillas</span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox">
+                            <span>Push-up</span>
+                        </label>
+                    </div>
+                </aside>
+
+                <!-- Products Grid -->
+                <div class="products-main">
+                    <div class="products-header">
+                        <div class="sort-dropdown">
+                            <span>Ordenar Por</span>
+                            <select class="sort-select">
+                                <option>MÁS RECIENTE</option>
+                                <option>Precio: Menor a Mayor</option>
+                                <option>Precio: Mayor a Menor</option>
+                                <option>Nombre A-Z</option>
+                                <option>Nombre Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="products-grid">
+                        <!-- Product Card 1 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-30%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Bikini Mujer Soporte Máximo Azul Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$29.990</span>
+                                    <span class="price-sale">$20.993</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 2 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-25%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Traje de Baño Entero Negro Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$34.990</span>
+                                    <span class="price-sale">$26.243</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 3 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-40%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Bikini Entero Verde Esmeralda Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$27.990</span>
+                                    <span class="price-sale">$16.794</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 4 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-35%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Bikini Sostén Push-up Rosa Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$24.990</span>
+                                    <span class="price-sale">$16.244</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 5 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-20%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Traje de Baño Entero Estampado Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$32.990</span>
+                                    <span class="price-sale">$26.392</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 6 -->
+                        <div class="product-card">
+                            <div class="product-image">
+                                <div class="sale-badge">-30%</div>
+                                <div class="product-placeholder">Imagen del Producto</div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-name">Bikini Con Varillas Blanco Hai</h3>
+                                <div class="product-price">
+                                    <span class="price-original">$28.990</span>
+                                    <span class="price-sale">$20.293</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <h3>Envío Gratis</h3>
+                    <p>En compras sobre $50.000</p>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h3>Cambios Gratis</h3>
+                    <p>Hasta 30 días después</p>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <h3>Calidad Premium</h3>
+                    <p>Materiales de primera calidad</p>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    <h3>Atención Personalizada</h3>
+                    <p>Asesoría en tallas y estilos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-logo">Hai Swimwear</h3>
+                    <p>Trajes de baño diseñados especialmente para mujeres con busto grande. Comodidad, estilo y soporte perfecto.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Información</h4>
+                    <ul>
+                        <li><a href="#tallas">Guía de Tallas</a></li>
+                        <li><a href="#envios">Envíos y Devoluciones</a></li>
+                        <li><a href="#preguntas">Preguntas Frecuentes</a></li>
+                        <li><a href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#terminos">Términos y Condiciones</a></li>
+                        <li><a href="#privacidad">Política de Privacidad</a></li>
+                        <li><a href="#cambios">Política de Cambios</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Síguenos</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Instagram">Instagram</a>
+                        <a href="#" aria-label="Facebook">Facebook</a>
+                        <a href="#" aria-label="TikTok">TikTok</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Hai Swimwear. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,22 @@
+===========================================
+  ⚠️ IMPORTANTE - LEE ESTO
+===========================================
+
+PROBLEMA: "Unexpected token '<', "<?php"..."
+
+CAUSA: Estás abriendo el archivo directamente en lugar 
+       de usar un servidor web.
+
+SOLUCIÓN:
+
+1. NO abras index.html con doble clic
+2. Usa SIEMPRE: http://localhost/...
+
+Ejemplo:
+   ❌ file:///D:/Pagina Hai definitiva/admin/index.html
+   ✅ http://localhost/Pagina%20Hai%20definitiva/admin/index.html
+
+3. Asegúrate de tener XAMPP/WAMP corriendo
+
+===========================================
+

@@ -1,0 +1,230 @@
+<?php
+/**
+ * Configuración de conexión a MySQL/MariaDB
+ * Hai Swimwear
+ * 
+ * INSTRUCCIONES:
+ * 1. Copia este archivo a: config_mysql.php
+ * 2. Completa las credenciales de tu base de datos
+ * 3. NO subas config_mysql.php a Git (está en .gitignore)
+ */
+
+// Configuración de MySQL/MariaDB
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'hai_swimwear');
+define('DB_USER', 'root');        // Tu usuario MySQL
+define('DB_PASS', '');             // Tu contraseña MySQL (vacío si no tienes)
+define('DB_PORT', '3306');
+
+// Configuración de la aplicación
+define('APP_NAME', 'Hai Swimwear');
+define('APP_URL', 'http://localhost');
+define('ADMIN_PATH', '/admin');
+
+// Configuración de sesión
+define('SESSION_LIFETIME', 3600); // 1 hora
+
+// Configuración de seguridad
+define('PASSWORD_MIN_LENGTH', 8);
+define('MAX_LOGIN_ATTEMPTS', 5);
+define('LOGIN_LOCKOUT_TIME', 900); // 15 minutos
+
+// Configuración de archivos
+define('UPLOAD_DIR', 'uploads/');
+define('MAX_FILE_SIZE', 5242880); // 5MB
+define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+
+// Zona horaria
+date_default_timezone_set('America/Santiago');
+
+/**
+ * Conexión a MySQL/MariaDB
+ */
+class Database {
+    private static $instance = null;
+    private $conn;
+    
+    private function __construct() {
+        try {
+            $dsn = "mysql:host=" . DB_HOST . 
+                   ";port=" . DB_PORT . 
+                   ";dbname=" . DB_NAME . 
+                   ";charset=utf8mb4";
+            
+            $options = [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::ATTR_PERSISTENT         => false,
+            ];
+            
+            $this->conn = new PDO($dsn, DB_USER, DB_PASS, $options);
+        } catch(PDOException $e) {
+            error_log("Error de conexión a MySQL: " . $e->getMessage());
+            die("Error de conexión a la base de datos. Por favor, verifica tu configuración.");
+        }
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    public function getConnection() {
+        return $this->conn;
+    }
+    
+    private function __clone() {}
+    
+    public function __wakeup() {
+        throw new Exception("Cannot unserialize singleton");
+    }
+}
+
+function getDB() {
+    return Database::getInstance()->getConnection();
+}
+
+function executeQuery($sql, $params = []) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    } catch(PDOException $e) {
+        error_log("Error en consulta: " . $e->getMessage());
+        error_log("SQL: " . $sql);
+        error_log("Params: " . print_r($params, true));
+        return false;
+    }
+}
+
+function fetchOne($sql, $params = []) {
+    $stmt = executeQuery($sql, $params);
+    return $stmt ? $stmt->fetch() : false;
+}
+
+function fetchAll($sql, $params = []) {
+    $stmt = executeQuery($sql, $params);
+    return $stmt ? $stmt->fetchAll() : [];
+}
+
+function insertAndGetId($sql, $params = []) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $db->lastInsertId();
+    } catch(PDOException $e) {
+        error_log("Error al insertar: " . $e->getMessage());
+        error_log("SQL: " . $sql);
+        return false;
+    }
+}
+
+function isAuthenticated() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    return isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
+}
+
+function isAdmin() {
+    return isAuthenticated() && in_array($_SESSION['user_role'], ['admin', 'super_admin']);
+}
+
+function isSuperAdmin() {
+    return isAuthenticated() && $_SESSION['user_role'] === 'super_admin';
+}
+
+function requireAuth() {
+    if (!isAuthenticated()) {
+        header('Location: ' . ADMIN_PATH . '/login.php');
+        exit;
+    }
+}
+
+function requireAdmin() {
+    requireAuth();
+    if (!isAdmin()) {
+        header('Location: ' . ADMIN_PATH . '/index.php?error=no_permission');
+        exit;
+    }
+}
+
+function requireSuperAdmin() {
+    requireAuth();
+    if (!isSuperAdmin()) {
+        header('Location: ' . ADMIN_PATH . '/index.php?error=no_permission');
+        exit;
+    }
+}
+
+function sanitize($data) {
+    if (is_array($data)) {
+        return array_map('sanitize', $data);
+    }
+    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+}
+
+function validateEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+function jsonResponse($success, $message, $data = null) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $success,
+        'message' => $message,
+        'data' => $data
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+function formatCurrency($amount) {
+    return number_format($amount, 0, ',', '.');
+}
+
+function getConfig($key, $default = null) {
+    try {
+        $config = fetchOne("SELECT valor FROM configuracion WHERE clave = ?", [$key]);
+        return $config ? $config['valor'] : $default;
+    } catch (Exception $e) {
+        return $default;
+    }
+}
+
+function setConfig($key, $value) {
+    $sql = "INSERT INTO configuracion (clave, valor) VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE valor = ?";
+    return executeQuery($sql, [$key, $value, $value]);
+}
+
+function verifyPassword($password, $hash) {
+    return password_verify($password, $hash);
+}
+
+function hashPassword($password) {
+    return password_hash($password, PASSWORD_BCRYPT);
+}
+
+function testConnection() {
+    try {
+        $db = getDB();
+        $result = fetchOne("SELECT VERSION() as version");
+        return [
+            'success' => true,
+            'message' => 'Conexión exitosa a MySQL',
+            'version' => $result['version'] ?? 'Desconocida'
+        ];
+    } catch(Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Error de conexión: ' . $e->getMessage()
+        ];
+    }
+}
+
+?>

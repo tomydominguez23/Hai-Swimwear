@@ -1,0 +1,31 @@
+===========================================
+  PASOS RÁPIDOS - ESTÁS EN SETTINGS > DATABASE
+===========================================
+
+1. BUSCA EN LA PÁGINA:
+
+   ¿Ves alguna de estas secciones?
+   - "Connection string"
+   - "Connection info"  
+   - "Connection parameters"
+   - Una tabla con Host, Database, User, Port
+
+2. PARA LA CONTRASEÑA:
+
+   Ya la ves en la página:
+   - Sección: "Database password"
+   - ¿La contraseña M7s5bjxY5F99arcu es correcta?
+   - Si no, haz clic en "Reset database password"
+
+3. SI NO VES LAS CREDENCIALES:
+
+   Ve a: SQL Editor (menú lateral)
+   Ahí puede haber un botón "Connection info"
+
+4. LO QUE NECESITO:
+
+   Dime qué secciones ves en la página de Database Settings
+   O comparte una captura de pantalla de lo que ves
+
+===========================================
+

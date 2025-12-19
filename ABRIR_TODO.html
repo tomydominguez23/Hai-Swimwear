@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enlaces Rápidos - Panel Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            background: #000;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .link-item {
+            display: block;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+        .link-item:hover {
+            background: #e3f2fd;
+            border-left-color: #2196F3;
+            transform: translateX(5px);
+        }
+        .link-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #000;
+        }
+        .link-item span {
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .status.important {
+            background: #ffeb3b;
+            color: #000;
+        }
+        .status.test {
+            background: #4caf50;
+            color: white;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .info-box strong {
+            color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Enlaces Rápidos - Panel Admin</h1>
+        <p class="subtitle">Haz clic en cualquier enlace para abrirlo</p>
+        
+        <div class="info-box">
+            <strong>⚠️ IMPORTANTE:</strong> Asegúrate de tener XAMPP/WAMP corriendo y usar <code>http://localhost</code>
+        </div>
+
+        <div class="section">
+            <div class="section-title">1️⃣ Verificación de Base de Datos</div>
+            <a href="verificar_que_falta.php" target="_blank" class="link-item">
+                <strong>✅ Verificar qué Falta</strong>
+                <span>Verifica conexión, tablas, usuario admin, etc.</span>
+                <span class="status test">PRIMERO</span>
+            </a>
+            <a href="test_connection.php" target="_blank" class="link-item">
+                <strong>🔍 Test de Conexión</strong>
+                <span>Prueba la conexión a Supabase</span>
+            </a>
+            <a href="api.php?action=test" target="_blank" class="link-item">
+                <strong>🧪 Test de API</strong>
+                <span>Verifica que la API funcione (debe mostrar JSON)</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2️⃣ Login y Panel Admin</div>
+            <a href="login.php" target="_blank" class="link-item">
+                <strong>🔐 Login</strong>
+                <span>Inicia sesión (Email: admin@haiswimwear.com / Pass: admin123)</span>
+                <span class="status important">IMPORTANTE</span>
+            </a>
+            <a href="index.html" target="_blank" class="link-item">
+                <strong>📊 Panel de Administración</strong>
+                <span>Panel principal - Gestiona productos, pedidos, etc.</span>
+                <span class="status important">PRINCIPAL</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3️⃣ Pruebas de Funcionalidad</div>
+            <a href="verificar_conexion.php" target="_blank" class="link-item">
+                <strong>🔧 Verificar Conexión Completa</strong>
+                <span>Diagnóstico completo del sistema</span>
+            </a>
+            <a href="test_api_endpoint.php" target="_blank" class="link-item">
+                <strong>📡 Test de Endpoint API</strong>
+                <span>Prueba todos los endpoints de la API</span>
+            </a>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📝 Información</div>
+            <div class="info-box">
+                <strong>Credenciales de Login:</strong><br>
+                Email: <code>admin@haiswimwear.com</code><br>
+                Contraseña: <code>admin123</code>
+            </div>
+            <div class="info-box">
+                <strong>Orden Recomendado:</strong><br>
+                1. Verificar qué Falta<br>
+                2. Login<br>
+                3. Panel Admin<br>
+                4. Crear un producto de prueba
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Detectar si está usando file:// y mostrar advertencia
+        if (window.location.protocol === 'file:') {
+            alert('⚠️ IMPORTANTE: Estás abriendo el archivo directamente.\n\nDebes usar un servidor web:\n- http://localhost/Pagina%20Hai%20definitiva/admin/ABRIR_TODO.html\n\nO inicia XAMPP/WAMP y usa http://localhost');
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,20 @@
+===========================================
+  RUTA RÁPIDA A LAS CREDENCIALES
+===========================================
+
+ESTÁS EN: Database > Tables > usuarios
+
+PARA IR A CREDENCIALES:
+
+1. Menú lateral izquierdo
+2. Sección "CONFIGURATION"
+3. Haz clic en "Settings"
+4. Luego haz clic en "Database"
+
+AHÍ ENCONTRARÁS:
+- Connection string
+- O Connection info
+- O una tabla con Host, Database, User, Port
+
+===========================================
+
