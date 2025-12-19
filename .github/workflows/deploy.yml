@@ -27,7 +27,10 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./
+        # Si el usuario ya cae en su carpeta raíz, no definimos server-dir o usamos ./
+        # Forzamos modo pasivo y seguridad relajada para evitar bloqueos
+        protocol: ftps
+        strict: false
         exclude: |
           **/.git*
           **/.git*/**
