@@ -279,6 +279,8 @@ async function handleProductSubmit(e) {
     
     try {
         showLoading(true);
+        
+        // 1. Crear el producto primero
         const response = await fetch(`${API_URL}?action=productos`, {
             method: 'POST',
             headers: {
@@ -290,13 +292,21 @@ async function handleProductSubmit(e) {
         const result = await response.json();
         
         if (result.success) {
+            const productId = result.data.id;
+            
+            // 2. Subir las imágenes si existen
+            const imageFiles = document.getElementById('productImages').files;
+            if (imageFiles && imageFiles.length > 0) {
+                await uploadProductImages(productId, imageFiles);
+            }
+            
+            // 3. Crear página individual del producto
+            await createProductPage(productId, productData);
+            
             showNotification('Producto creado exitosamente', 'success');
             closeModal('nuevoProductoModal');
             
-            // Crear página individual del producto
-            await createProductPage(result.data.id, productData);
-            
-            // Recargar lista de productos
+            // 4. Recargar lista de productos
             loadProducts();
         } else {
             showNotification('Error: ' + result.message, 'error');
@@ -306,6 +316,36 @@ async function handleProductSubmit(e) {
         showNotification('Error al crear producto', 'error');
     } finally {
         showLoading(false);
+    }
+}
+
+async function uploadProductImages(productId, files) {
+    try {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        
+        // Agregar todas las imágenes al FormData
+        for (let i = 0; i < files.length; i++) {
+            formData.append('imagenes[]', files[i]);
+            formData.append('alt_text[]', files[i].name);
+        }
+        
+        const response = await fetch(`${API_URL}?action=upload_product_images`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('Imágenes subidas exitosamente:', result.data);
+        } else {
+            console.error('Error al subir imágenes:', result.message);
+            showNotification('Advertencia: Producto creado pero algunas imágenes no se pudieron subir', 'warning');
+        }
+    } catch (error) {
+        console.error('Error al subir imágenes:', error);
+        showNotification('Advertencia: Producto creado pero las imágenes no se pudieron subir', 'warning');
     }
 }
 
