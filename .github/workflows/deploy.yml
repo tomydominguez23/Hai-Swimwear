@@ -1,0 +1,33 @@
+name: 🚀 Despliegue Automático (FTP)
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta cuando haces push a la rama 'main'
+
+jobs:
+  web-deploy:
+    name: 🎉 Desplegar a Hosting
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Obtener el código más reciente
+      uses: actions/checkout@v4
+
+    - name: 📂 Sincronizar archivos vía FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # server-dir: /public_html/  # Descomenta y ajusta si tu web está en una subcarpeta
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          **/node_modules/**
+          **/tests/**
+          README.md
+          *.md
+          *.sql
+          # Excluimos la configuración local para no romper la de producción
+          # config_mysql.php 
