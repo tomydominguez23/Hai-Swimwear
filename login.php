@@ -4,7 +4,31 @@
  * Hai Swimwear
  */
 
-require_once '../database/config_supabase.php';
+// Activar visualización de errores para depuración (desactivar en producción estable)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Intentar cargar configuración (MySQL > Supabase > PostgreSQL > Default)
+$configLoaded = false;
+$configPaths = [
+    __DIR__ . '/config_mysql.php',
+    __DIR__ . '/../database/config_mysql.php', // Por compatibilidad si se mueve
+    __DIR__ . '/config_produccion.php', // Por si acaso
+    __DIR__ . '/config.php'
+];
+
+foreach ($configPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $configLoaded = true;
+        break;
+    }
+}
+
+if (!$configLoaded) {
+    die("Error crítico: No se encontró el archivo de configuración (config_mysql.php). Verifica que el despliegue haya funcionado correctamente.");
+}
 
 session_start();
 
