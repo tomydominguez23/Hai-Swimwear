@@ -3,7 +3,7 @@ name: 🚀 Despliegue Automático (FTP)
 on:
   push:
     branches:
-      - main  # Se ejecuta cuando haces push a la rama 'main'
+      - main
 
 jobs:
   web-deploy:
@@ -13,13 +13,21 @@ jobs:
     - name: 🚚 Obtener el código más reciente
       uses: actions/checkout@v4
 
+    # 1. Preparamos el archivo de configuración para producción
+    # Renombramos config_produccion.php a config_mysql.php ANTES de subir
+    # Esto "engaña" al sistema para subir la config real pisando la local
+    - name: ⚙️ Preparar configuración de producción
+      run: |
+        mv config_produccion.php config_mysql.php
+
+    # 2. Subimos todo al hosting
     - name: 📂 Sincronizar archivos vía FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        # server-dir: /public_html/  # Descomenta y ajusta si tu web está en una subcarpeta
+        # server-dir: /public_html/
         exclude: |
           **/.git*
           **/.git*/**
@@ -29,5 +37,5 @@ jobs:
           README.md
           *.md
           *.sql
-          # Excluimos la configuración local para no romper la de producción
-          # config_mysql.php 
+          config.php.example
+          # NO excluimos config_mysql.php porque ahora contiene los datos de producción
