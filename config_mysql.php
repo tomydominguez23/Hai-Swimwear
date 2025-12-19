@@ -153,24 +153,21 @@ function insertAndGetId($sql, $params = []) {
  * Verificar si el usuario está autenticado
  */
 function isAuthenticated() {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    return isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
+    return true; // BYPASS LOGIN
 }
 
 /**
  * Verificar si el usuario es administrador
  */
 function isAdmin() {
-    return isAuthenticated() && in_array($_SESSION['user_role'], ['admin', 'super_admin']);
+    return true; // BYPASS LOGIN
 }
 
 /**
  * Verificar si el usuario es super administrador
  */
 function isSuperAdmin() {
-    return isAuthenticated() && $_SESSION['user_role'] === 'super_admin';
+    return true; // BYPASS LOGIN
 }
 
 /**
