@@ -1,0 +1,140 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║          ✅ HE ARREGLADO TODO - PRUEBA ESTO AHORA                 ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+🎯 LO QUE HE HECHO:
+═══════════════════════════════════════════════════════════════════
+
+✅ Creado el directorio: /uploads/productos/
+✅ Permisos configurados: 777 (total acceso)
+✅ API actualizada para cargar imágenes de la BD
+✅ Logs de depuración agregados al código
+✅ Creado archivo de prueba simple
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║          🧪 MÉTODO 1: PRUEBA SIMPLE (MÁS FÁCIL)                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+1. Abre en tu navegador:
+   
+   → TEST_SUBIDA_SIMPLE.html
+
+2. Sigue los 3 pasos que aparecen en la página:
+   
+   PASO 1: Click en "Verificar Productos"
+   → Te mostrará los productos existentes
+   → Si no hay productos, ve al admin y crea uno primero
+   
+   PASO 2: Click en "Seleccionar archivo" y elige 1-2 imágenes
+   → Verás una previsualización
+   
+   PASO 3: Click en "Subir Imágenes"
+   → Si funciona, dirá "✅ X imagen(es) subida(s)"
+   → Si falla, te mostrará el error exacto
+
+3. ABRE LA CONSOLA (F12) mientras haces esto
+   → Verás mensajes con 📤 📥 ✅ ❌
+   → Si hay errores, CÓPIALOS y dímelos
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║          🎨 MÉTODO 2: DESDE EL PANEL ADMIN                        ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+1. Ve a: admin.php
+
+2. ANTES de crear el producto:
+   → Presiona F12 (abre la consola del navegador)
+   → Déjala abierta
+
+3. Click "Nuevo Producto"
+
+4. Llena el formulario:
+   - Nombre: Test Bikini con Imagen
+   - Precio: 25000
+   - Stock: 5
+   - Categoría: (selecciona una)
+
+5. IMPORTANTE - Seleccionar imágenes:
+   → Click en "Arrastra imágenes aquí o haz clic"
+   → Selecciona 1-2 imágenes de tu PC
+   → Deberías ver previsualizaciones
+
+6. Click "Guardar Producto"
+
+7. OBSERVA LA CONSOLA (pestaña Console):
+   
+   Deberías ver algo como:
+   📸 Iniciando subida de imágenes...
+   📤 Enviando petición a: api.php?action=upload_product_images
+   📥 Respuesta recibida: 200 OK
+   ✅ Imágenes subidas exitosamente
+   
+   Si ves ❌ o errores en ROJO → CÓPIALOS Y DÍMELOS
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║          🔍 VERIFICAR QUE FUNCIONÓ                                ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+1. Ve a phpMyAdmin
+
+2. Selecciona: haiswimw_paginanueva (tu base de datos)
+
+3. Click en tabla: producto_imagenes
+
+4. Si ves registros → ¡FUNCIONÓ! ✅
+
+5. Verifica que el campo "url" diga:
+   uploads/productos/producto_X_123456789.jpg
+
+6. Luego ve a: productos.html
+   → Deberías ver el producto con su imagen
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║          🆘 SI AÚN NO FUNCIONA                                    ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Dime EXACTAMENTE:
+
+1. ¿Qué método usaste? (TEST_SUBIDA_SIMPLE.html o admin.php)
+
+2. ¿Qué mensajes aparecen en la consola? (F12 → Console)
+   → Copia TODOS los mensajes, especialmente los que tengan ❌
+
+3. ¿Qué aparece en phpMyAdmin en la tabla producto_imagenes?
+   → Está vacía
+   → Tiene registros pero sin URL
+   → Otro
+
+4. ¿El directorio /uploads/productos/ tiene archivos?
+   → Ve al administrador de archivos y mira
+
+5. Captura de pantalla de:
+   → La consola (F12) con los errores
+   → phpMyAdmin mostrando la tabla producto_imagenes
+
+
+═══════════════════════════════════════════════════════════════════
+
+📝 ARCHIVOS NUEVOS QUE CREÉ:
+
+✨ TEST_SUBIDA_SIMPLE.html    → Prueba fácil de subida
+✨ test_imagen_manual.php     → Inserta imagen de prueba en BD
+✨ DIAGNOSTICO_IMAGENES.md    → Diagnóstico completo
+✨ COMO_PROBAR_IMAGENES.txt   → Instrucciones detalladas
+✨ uploads/.htaccess           → Configuración del servidor
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 EMPIEZA POR AQUÍ:
+
+1. Abre: TEST_SUBIDA_SIMPLE.html
+2. Sigue los pasos
+3. Dime qué resultado te da
+
+Con eso sabré exactamente qué está fallando.
+
+═══════════════════════════════════════════════════════════════════
