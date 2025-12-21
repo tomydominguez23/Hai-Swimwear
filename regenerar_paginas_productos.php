@@ -4,8 +4,27 @@
  * con el formato actualizado (imágenes y header correctos)
  */
 
-// Cargar configuración
-require_once __DIR__ . '/config_mysql.php';
+// Cargar configuración - Intentar con diferentes configuraciones
+$configLoaded = false;
+
+$configPaths = [
+    __DIR__ . '/config_mysql.php',
+    __DIR__ . '/config_supabase.php',
+    __DIR__ . '/config_postgresql.php',
+    __DIR__ . '/config.php'
+];
+
+foreach ($configPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $configLoaded = true;
+        break;
+    }
+}
+
+if (!$configLoaded) {
+    die("Error: No se pudo cargar ningún archivo de configuración.");
+}
 
 echo "<!DOCTYPE html>";
 echo "<html><head><meta charset='UTF-8'><title>Regenerar Páginas</title></head><body>";
@@ -43,7 +62,13 @@ try {
         // Determinar URL de imagen
         $imagenUrl = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         if (!empty($imagenes)) {
-            $imagenUrl = '../' . $imagenes[0]['url'];
+            // Si la URL ya es absoluta (http/https), usarla directamente
+            if (strpos($imagenes[0]['url'], 'http') === 0) {
+                $imagenUrl = $imagenes[0]['url'];
+            } else {
+                // Si es relativa, agregar ../ para navegar desde /productos/
+                $imagenUrl = '../' . $imagenes[0]['url'];
+            }
             echo "<p>✓ Imagen encontrada: {$imagenes[0]['url']}</p>";
         } else {
             echo "<p>⚠️ Sin imágenes - usando placeholder</p>";
