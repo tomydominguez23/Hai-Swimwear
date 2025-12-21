@@ -1,0 +1,65 @@
+═══════════════════════════════════════════════════════════════
+    ⚡ INICIO RÁPIDO - PRODUCTOS SOLO DE USUARIO
+    Hai Swimwear
+═══════════════════════════════════════════════════════════════
+
+🎯 OBJETIVO:
+Mostrar solo TUS productos en el sitio web (ocultar productos de prueba)
+
+═══════════════════════════════════════════════════════════════
+
+📝 3 PASOS SIMPLES:
+
+1. Abre esto en tu navegador:
+   👉 INICIO_GESTION_PRODUCTOS.html
+
+2. Sigue las instrucciones en pantalla
+
+3. ¡Listo! Tu sitio mostrará solo tus productos reales
+
+═══════════════════════════════════════════════════════════════
+
+⚡ O SI PREFIERES IR DIRECTO:
+
+PASO 1: Abre en tu navegador:
+http://localhost/instalar_sistema_productos.php
+→ Haz clic en "Instalar Ahora"
+
+PASO 2: Abre en tu navegador:
+http://localhost/gestionar_productos_prueba.php
+→ Selecciona productos de prueba
+→ Haz clic en "Eliminar Seleccionados"
+
+PASO 3: Verifica tu sitio web:
+http://localhost/index.html
+→ Solo verás tus productos reales
+
+═══════════════════════════════════════════════════════════════
+
+📚 MÁS INFORMACIÓN:
+
+- INICIO_GESTION_PRODUCTOS.html → Interfaz visual completa
+- INSTRUCCIONES_PRODUCTOS_FINALES.txt → Guía paso a paso
+- GUIA_PRODUCTOS_USUARIO.md → Documentación detallada
+
+═══════════════════════════════════════════════════════════════
+
+✅ ¿QUÉ HACE ESTO?
+
+ANTES:
+- Tu sitio mostraba productos de prueba
+- Visitantes veían productos que no existen
+- Difícil identificar cuáles eliminar
+
+DESPUÉS:
+✅ Solo se muestran tus productos reales
+✅ Productos de prueba ocultos automáticamente
+✅ Interfaz fácil para gestionar todo
+
+═══════════════════════════════════════════════════════════════
+
+🚀 ¡EMPIEZA AHORA!
+
+Abre: INICIO_GESTION_PRODUCTOS.html
+
+═══════════════════════════════════════════════════════════════
