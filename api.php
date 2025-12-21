@@ -132,8 +132,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
 // Verificar autenticación (solo para acciones que lo requieren)
-// Permitir algunas acciones sin autenticación para debugging
-$publicActions = ['test']; // Acciones públicas
+// Permitir algunas acciones sin autenticación para el frontend público
+$publicActions = ['test', 'productos', 'categorias']; // Acciones públicas
 if (!in_array($action, $publicActions)) {
     if (!function_exists('isAuthenticated') || !isAuthenticated()) {
         http_response_code(401);
