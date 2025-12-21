@@ -1,16 +1,16 @@
+#!/usr/bin/env php
 <?php
 /**
- * Script para regenerar las páginas de productos existentes
- * con el formato actualizado (imágenes y header correctos)
+ * Script para verificar y solucionar problemas con imágenes de productos
+ * Hai Swimwear
  */
 
-// Cargar configuración - Intentar con diferentes configuraciones
+// Cargar configuración
 $configLoaded = false;
-
 $configPaths = [
-    __DIR__ . '/config_mysql.php',
     __DIR__ . '/config_supabase.php',
     __DIR__ . '/config_postgresql.php',
+    __DIR__ . '/config_mysql.php',
     __DIR__ . '/config.php'
 ];
 
@@ -18,42 +18,109 @@ foreach ($configPaths as $path) {
     if (file_exists($path)) {
         require_once $path;
         $configLoaded = true;
+        echo "✓ Configuración cargada: " . basename($path) . "\n";
         break;
     }
 }
 
 if (!$configLoaded) {
-    die("Error: No se pudo cargar ningún archivo de configuración.");
+    die("❌ Error: No se encontró archivo de configuración\n");
 }
 
-echo "<!DOCTYPE html>";
-echo "<html><head><meta charset='UTF-8'><title>Regenerar Páginas</title></head><body>";
-echo "<h1>🔄 Regenerando Páginas de Productos</h1>";
+// Detectar tipo de base de datos
+$isPostgres = defined('SUPABASE_HOST') || defined('POSTGRES_HOST');
+echo "Base de datos: " . ($isPostgres ? "PostgreSQL/Supabase" : "MySQL") . "\n\n";
+
+echo "=== SOLUCIONANDO PROBLEMAS DE IMÁGENES DE PRODUCTOS ===\n\n";
 
 try {
-    // Obtener todos los productos
+    // 1. Verificar productos sin imágenes
+    echo "1. VERIFICANDO PRODUCTOS...\n";
+    echo str_repeat("-", 60) . "\n";
+    
     $productos = fetchAll("SELECT * FROM productos ORDER BY id ASC");
     
     if (empty($productos)) {
-        echo "<p style='color: orange;'>⚠️ No hay productos para regenerar.</p>";
-        echo "</body></html>";
-        exit;
+        echo "⚠️  No hay productos en la base de datos.\n\n";
+        exit(0);
     }
     
-    echo "<p>Productos encontrados: " . count($productos) . "</p>";
-    echo "<hr>";
+    echo "✓ Total de productos: " . count($productos) . "\n\n";
+    
+    // 2. Verificar imágenes y asignar placeholders si es necesario
+    echo "2. VERIFICANDO IMÁGENES...\n";
+    echo str_repeat("-", 60) . "\n";
+    
+    $productosSinImagenes = [];
+    $productosConImagenes = [];
+    
+    foreach ($productos as $producto) {
+        if ($isPostgres) {
+            $imagenes = fetchAll(
+                "SELECT * FROM producto_imagenes WHERE producto_id = $1 ORDER BY es_principal DESC, orden ASC",
+                [$producto['id']]
+            );
+        } else {
+            $imagenes = fetchAll(
+                "SELECT * FROM producto_imagenes WHERE producto_id = ? ORDER BY es_principal DESC, orden ASC",
+                [$producto['id']]
+            );
+        }
+        
+        if (empty($imagenes)) {
+            $productosSinImagenes[] = $producto;
+            echo "⚠️  Producto '{$producto['nombre']}' (ID: {$producto['id']}) - SIN IMÁGENES\n";
+        } else {
+            $productosConImagenes[] = $producto;
+            echo "✓ Producto '{$producto['nombre']}' (ID: {$producto['id']}) - {" . count($imagenes) . " imagen(es)}\n";
+        }
+    }
+    
+    echo "\n";
+    
+    // 3. Crear directorio de uploads si no existe
+    echo "3. VERIFICANDO DIRECTORIO DE UPLOADS...\n";
+    echo str_repeat("-", 60) . "\n";
+    
+    $uploadsDir = __DIR__ . '/uploads/';
+    if (!is_dir($uploadsDir)) {
+        mkdir($uploadsDir, 0755, true);
+        echo "✓ Directorio /uploads/ creado\n";
+    } else {
+        echo "✓ Directorio /uploads/ existe\n";
+    }
+    
+    $uploadsProdDir = __DIR__ . '/uploads/productos/';
+    if (!is_dir($uploadsProdDir)) {
+        mkdir($uploadsProdDir, 0755, true);
+        echo "✓ Directorio /uploads/productos/ creado\n";
+    } else {
+        echo "✓ Directorio /uploads/productos/ existe\n";
+    }
+    
+    // Asegurar permisos
+    chmod($uploadsDir, 0755);
+    if (is_dir($uploadsProdDir)) {
+        chmod($uploadsProdDir, 0755);
+    }
+    
+    echo "\n";
+    
+    // 4. Regenerar páginas HTML de todos los productos
+    echo "4. REGENERANDO PÁGINAS HTML DE PRODUCTOS...\n";
+    echo str_repeat("-", 60) . "\n";
+    
+    $productosDir = __DIR__ . '/productos/';
+    if (!is_dir($productosDir)) {
+        mkdir($productosDir, 0755, true);
+        echo "✓ Directorio /productos/ creado\n";
+    }
     
     $regenerados = 0;
     $errores = 0;
     
     foreach ($productos as $producto) {
-        echo "<div style='padding: 10px; margin: 10px 0; background: #f5f5f5; border-left: 4px solid #4CAF50;'>";
-        echo "<h3>Producto: {$producto['nombre']} (ID: {$producto['id']})</h3>";
-        
-        // Obtener imágenes del producto - Usar placeholders correctos según el tipo de BD
-        // Detectar si estamos usando PostgreSQL/Supabase
-        $isPostgres = defined('SUPABASE_HOST') || defined('POSTGRES_HOST');
-        
+        // Obtener imágenes del producto
         if ($isPostgres) {
             $imagenes = fetchAll(
                 "SELECT url, alt_text FROM producto_imagenes WHERE producto_id = $1 ORDER BY es_principal DESC, orden ASC",
@@ -69,8 +136,9 @@ try {
         // Generar slug
         $slug = slugify($producto['nombre']);
         
-        // Determinar URL de imagen
+        // Determinar URL de imagen con fallback de Unsplash
         $imagenUrl = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+        
         if (!empty($imagenes)) {
             // Si la URL ya es absoluta (http/https), usarla directamente
             if (strpos($imagenes[0]['url'], 'http') === 0) {
@@ -79,9 +147,6 @@ try {
                 // Si es relativa, agregar ../ para navegar desde /productos/
                 $imagenUrl = '../' . $imagenes[0]['url'];
             }
-            echo "<p>✓ Imagen encontrada: {$imagenes[0]['url']}</p>";
-        } else {
-            echo "<p>⚠️ Sin imágenes - usando placeholder</p>";
         }
         
         // Calcular descuento
@@ -96,39 +161,50 @@ try {
         $html = generarHTMLProducto($producto, $slug, $imagenUrl, $descuento);
         
         // Guardar archivo
-        $dirProductos = __DIR__ . '/productos';
-        if (!file_exists($dirProductos)) {
-            mkdir($dirProductos, 0755, true);
-        }
-        
-        $archivo = $dirProductos . '/' . $slug . '.html';
+        $archivo = $productosDir . $slug . '.html';
         
         if (file_put_contents($archivo, $html)) {
-            echo "<p style='color: green;'>✓ Página generada: <a href='productos/{$slug}.html' target='_blank'>productos/{$slug}.html</a></p>";
+            echo "✓ {$producto['nombre']} → productos/{$slug}.html\n";
             $regenerados++;
         } else {
-            echo "<p style='color: red;'>✗ Error al guardar archivo</p>";
+            echo "✗ Error al generar: {$producto['nombre']}\n";
             $errores++;
         }
-        
-        echo "</div>";
     }
     
-    echo "<hr>";
-    echo "<h2>Resumen:</h2>";
-    echo "<p>✓ Páginas regeneradas: <strong>{$regenerados}</strong></p>";
-    echo "<p>✗ Errores: <strong>{$errores}</strong></p>";
+    echo "\n";
     
-    if ($regenerados > 0) {
-        echo "<p style='color: green; font-size: 18px;'>🎉 ¡Listo! Ahora todas las páginas tienen el header correcto y las imágenes reales.</p>";
-        echo "<p><a href='productos.html'>Ver página de productos →</a></p>";
+    // 5. Resumen final
+    echo "=== RESUMEN FINAL ===\n";
+    echo str_repeat("-", 60) . "\n";
+    echo "Total de productos: " . count($productos) . "\n";
+    echo "Productos con imágenes: " . count($productosConImagenes) . "\n";
+    echo "Productos sin imágenes: " . count($productosSinImagenes) . "\n";
+    echo "Páginas HTML regeneradas: $regenerados\n";
+    echo "Errores: $errores\n\n";
+    
+    if (count($productosSinImagenes) > 0) {
+        echo "⚠️  ACCIÓN REQUERIDA:\n";
+        echo "Los siguientes productos necesitan imágenes reales:\n";
+        foreach ($productosSinImagenes as $prod) {
+            echo "  - {$prod['nombre']} (ID: {$prod['id']})\n";
+        }
+        echo "\nPara agregar imágenes:\n";
+        echo "1. Ve al panel de administración (login.php)\n";
+        echo "2. Edita cada producto\n";
+        echo "3. Sube imágenes desde el formulario de edición\n\n";
     }
+    
+    echo "✅ PROCESO COMPLETADO\n";
+    echo "\nAhora puedes:\n";
+    echo "1. Visitar: productos.html (ver listado)\n";
+    echo "2. Ver productos individuales en: productos/{slug}.html\n";
+    echo "3. Las imágenes faltantes mostrarán un placeholder de Unsplash\n\n";
     
 } catch (Exception $e) {
-    echo "<p style='color: red;'>Error: " . $e->getMessage() . "</p>";
+    echo "\n❌ ERROR: " . $e->getMessage() . "\n";
+    echo "Trace: " . $e->getTraceAsString() . "\n";
 }
-
-echo "</body></html>";
 
 function slugify($text) {
     $text = preg_replace('~[^\pL\d]+~u', '-', $text);
@@ -432,7 +508,7 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
             </div>
             
             <div class="product-info">
-                <div class="product-category">Hai Swimwear</div>
+                <div class="product-category">HAI SWIMWEAR</div>
                 <h1 class="product-title">{$producto['nombre']}</h1>
                 
                 <div class="product-price-section">
@@ -459,8 +535,6 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
                 <div class="product-specs">
                     <h3 style="margin-bottom: 20px; font-size: 20px;">Especificaciones</h3>
                     " . ($producto['sku'] ? "<div class=\"spec-row\"><span class=\"spec-label\">SKU:</span><span class=\"spec-value\">{$producto['sku']}</span></div>" : '') . "
-                    " . ($producto['dimensiones'] ? "<div class=\"spec-row\"><span class=\"spec-label\">Dimensiones:</span><span class=\"spec-value\">{$producto['dimensiones']}</span></div>" : '') . "
-                    " . ($producto['peso'] ? "<div class=\"spec-row\"><span class=\"spec-label\">Peso:</span><span class=\"spec-value\">{$producto['peso']} kg</span></div>" : '') . "
                     <div class=\"spec-row\">
                         <span class=\"spec-label\">Stock:</span>
                         <span class=\"spec-value\">{$stock} unidades</span>

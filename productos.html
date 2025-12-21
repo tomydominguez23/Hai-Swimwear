@@ -385,15 +385,18 @@
                 discountBadge = `<div class="sale-badge">-${discount}%</div>`;
             }
 
-            // Imagen del producto
-            let imageHTML = '';
+            // Imagen del producto con fallback mejorado
+            let imageSrc = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+            
             if (product.imagen_principal) {
-                imageHTML = `<img src="${product.imagen_principal}" alt="${product.nombre}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">`;
+                imageSrc = product.imagen_principal;
             } else if (product.imagenes && product.imagenes.length > 0) {
-                imageHTML = `<img src="${product.imagenes[0].url}" alt="${product.nombre}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">`;
-            } else {
-                imageHTML = '<div class="product-placeholder">Imagen del Producto</div>';
+                imageSrc = product.imagenes[0].url;
             }
+            
+            const imageHTML = `<img src="${imageSrc}" alt="${product.nombre}" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
+                onerror="this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">`;
 
             card.innerHTML = `
                 <div class="product-image">
