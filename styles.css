@@ -365,7 +365,7 @@ body {
 .section-header {
     display: flex;
     align-items: baseline;
-    gap: 15px;
+    gap: 5px;
     margin-bottom: 40px;
 }
 
