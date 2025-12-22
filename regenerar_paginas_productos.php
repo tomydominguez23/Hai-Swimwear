@@ -69,31 +69,44 @@ try {
         // Generar slug
         $slug = slugify($producto['nombre']);
         
-        // Determinar URL de imagen
-        $imagenUrl = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+        // Procesar imágenes
+        $processedImages = [];
         if (!empty($imagenes)) {
-            // Si la URL ya es absoluta (http/https), usarla directamente
-            if (strpos($imagenes[0]['url'], 'http') === 0) {
-                $imagenUrl = $imagenes[0]['url'];
-            } else {
-                // Si es relativa, agregar ../ para navegar desde /productos/
-                $imagenUrl = '../' . $imagenes[0]['url'];
+            foreach ($imagenes as $img) {
+                $imgUrl = $img['url'];
+                if (strpos($imgUrl, 'http') !== 0) {
+                    $imgUrl = '../' . $imgUrl;
+                }
+                $processedImages[] = [
+                    'url' => $imgUrl,
+                    'alt' => $img['alt_text'] ?? $producto['nombre']
+                ];
             }
-            echo "<p>✓ Imagen encontrada: {$imagenes[0]['url']}</p>";
+            echo "<p>✓ " . count($processedImages) . " imágenes encontradas</p>";
         } else {
+            // Placeholder
+            $processedImages[] = [
+                'url' => 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'alt' => $producto['nombre']
+            ];
             echo "<p>⚠️ Sin imágenes - usando placeholder</p>";
         }
         
         // Calcular descuento
-        $descuento = '';
+        $descuentoHTML = '';
+        $precioHTML = '';
+        
         if ($producto['precio_anterior'] && $producto['precio_anterior'] > $producto['precio']) {
             $porcentaje = round((($producto['precio_anterior'] - $producto['precio']) / $producto['precio_anterior']) * 100);
-            $descuento = "<span class=\"product-price-original\">$" . number_format($producto['precio_anterior'], 0, ',', '.') . "</span>
-                    <span class=\"product-discount\">-{$porcentaje}%</span>";
+            $precioHTML = '<span class="price-current">$' . number_format($producto['precio'], 0, ',', '.') . '</span>';
+            $precioHTML .= '<span class="price-original">$' . number_format($producto['precio_anterior'], 0, ',', '.') . '</span>';
+            $descuentoHTML = '<span class="discount-badge">-' . $porcentaje . '%</span>';
+        } else {
+            $precioHTML = '<span class="price-current">$' . number_format($producto['precio'], 0, ',', '.') . '</span>';
         }
         
         // Generar HTML
-        $html = generarHTMLProducto($producto, $slug, $imagenUrl, $descuento);
+        $html = generarHTMLProducto($producto, $slug, $processedImages, $precioHTML, $descuentoHTML);
         
         // Guardar archivo
         $dirProductos = __DIR__ . '/productos';
@@ -140,9 +153,31 @@ function slugify($text) {
     return $text;
 }
 
-function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
-    $precio = number_format($producto['precio'], 0, ',', '.');
+function generarHTMLProducto($producto, $slug, $imagenes, $precioHTML, $descuentoHTML) {
     $stock = intval($producto['stock']);
+    $thumbnailsHTML = '';
+    $mainImage = $imagenes[0]['url'];
+    
+    // Generar thumbnails
+    if (count($imagenes) > 1) {
+        foreach ($imagenes as $index => $img) {
+            $activeClass = $index === 0 ? 'active' : '';
+            $thumbnailsHTML .= "
+                <div class=\"thumbnail {$activeClass}\" onclick=\"changeImage(this, '{$img['url']}')\">
+                    <img src=\"{$img['url']}\" alt=\"Thumbnail {$index}\">
+                </div>";
+        }
+    } else {
+         $thumbnailsHTML .= "
+            <div class=\"thumbnail active\" onclick=\"changeImage(this, '{$mainImage}')\">
+                <img src=\"{$mainImage}\" alt=\"Thumbnail\">
+            </div>";
+    }
+    
+    // Pre-calculate dynamic values for HEREDOC
+    $availabilityClass = ($stock > 0 ? 'available' : 'out-of-stock');
+    $availabilityText = ($stock > 0 ? "Disponible ({$stock} unidades)" : 'Agotado');
+    $skuHTML = ($producto['sku'] ? "<div class=\"spec-item\"><span class=\"spec-label\">SKU</span><span class=\"spec-value\">{$producto['sku']}</span></div>" : '');
     
     return <<<HTML
 <!DOCTYPE html>
@@ -156,57 +191,103 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+        
         .product-detail-container {
-            max-width: 1200px;
-            margin: 80px auto 40px;
-            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+        
+        .breadcrumb {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            color: #000;
         }
         
         .product-detail-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 60% 40%;
             gap: 60px;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
         
-        .product-images {
-            position: sticky;
-            top: 100px;
+        /* Gallery Styles */
+        .product-gallery {
+            display: flex;
+            gap: 20px;
         }
         
-        .main-product-image {
+        .thumbnails-col {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .thumbnail {
             width: 100%;
-            aspect-ratio: 1;
-            background: #f8f8f8;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 20px;
+            aspect-ratio: 3/4;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
         }
         
-        .main-product-image img {
+        .thumbnail.active {
+            border-color: #000;
+        }
+        
+        .thumbnail img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .product-info {
-            padding: 20px 0;
+        .main-image-col {
+            flex: 1;
+            aspect-ratio: 3/4;
+            background: #f8f8f8;
+            overflow: hidden;
+            position: relative;
         }
         
-        .product-category {
+        .main-image-col img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Product Info Styles */
+        .product-info {
+            padding-top: 20px;
+        }
+        
+        .brand-name {
             color: #666;
             font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin-bottom: 10px;
         }
         
         .product-title {
-            font-size: 36px;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 20px;
             font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            line-height: 1.2;
         }
         
         .product-price-section {
@@ -216,140 +297,108 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
             margin-bottom: 30px;
         }
         
-        .product-price {
-            font-size: 32px;
-            font-weight: 700;
-            color: #000;
+        .price-current {
+            font-size: 28px;
+            font-weight: 600;
         }
         
-        .product-price-original {
-            font-size: 24px;
+        .price-original {
+            font-size: 18px;
             color: #999;
             text-decoration: line-through;
         }
         
-        .product-discount {
+        .discount-badge {
             background: #e63946;
             color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 4px 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
         }
         
-        .product-description {
-            font-size: 16px;
-            line-height: 1.8;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        
-        .product-stock {
+        .availability {
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 8px;
             font-size: 14px;
         }
         
-        .stock-indicator {
-            width: 10px;
-            height: 10px;
+        .dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #10b981;
         }
         
-        .stock-indicator.low {
-            background: #f59e0b;
-        }
+        .available .dot { background: #4CAF50; }
+        .out-of-stock .dot { background: #F44336; }
         
-        .stock-indicator.out {
-            background: #ef4444;
-        }
-        
+        /* Actions */
         .product-actions {
+            margin-top: 30px;
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-bottom: 40px;
         }
         
         .btn-add-cart {
-            flex: 1;
-            background: #000;
+            background: #25D366; /* WhatsApp Green */
             color: white;
             border: none;
-            padding: 15px 30px;
+            width: 100%;
+            padding: 18px;
             font-size: 16px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            border-radius: 4px;
             transition: background 0.3s;
+            text-align: center;
         }
         
         .btn-add-cart:hover {
-            background: #333;
-        }
-        
-        .btn-add-cart:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        
-        .btn-whatsapp:hover {
             background: #1da851;
         }
         
-        .product-specs {
+        .specs-section {
+            margin-top: 40px;
             border-top: 1px solid #eee;
             padding-top: 30px;
         }
         
-        .spec-row {
-            display: flex;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .spec-label {
-            flex: 0 0 150px;
+        .specs-title {
+            font-size: 18px;
             font-weight: 600;
-            color: #333;
+            margin-bottom: 20px;
         }
         
-        .spec-value {
-            flex: 1;
-            color: #666;
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f9f9f9;
+            font-size: 14px;
         }
         
-        @media (max-width: 768px) {
+        .spec-label { color: #666; }
+        .spec-value { font-weight: 500; }
+        
+        @media (max-width: 992px) {
             .product-detail-grid {
                 grid-template-columns: 1fr;
-                gap: 30px;
+                gap: 40px;
             }
-            
-            .product-images {
-                position: relative;
-                top: 0;
+            .product-gallery {
+                flex-direction: column-reverse;
             }
-            
-            .product-title {
-                font-size: 28px;
+            .thumbnails-col {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
             }
-            
-            .product-actions {
-                flex-direction: column;
+            .thumbnail {
+                width: 80px;
             }
         }
     </style>
@@ -409,61 +458,54 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </a>
-                    <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 2v2M15 2v2M9 20v2M15 20v2M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Product Detail -->
     <div class="product-detail-container">
         <div class="breadcrumb">
             <a href="../index.html">Home</a> / <a href="../productos.html">Productos</a> / <span>{$producto['nombre']}</span>
         </div>
         
         <div class="product-detail-grid">
-            <div class="product-images">
-                <div class="main-product-image">
-                    <img src="{$imagenUrl}" alt="{$producto['nombre']}" onerror="this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">
+            <div class="product-gallery">
+                <div class="thumbnails-col">
+                    {$thumbnailsHTML}
+                </div>
+                <div class="main-image-col">
+                    <img id="mainImage" src="{$mainImage}" alt="{$producto['nombre']}" onerror="this.src='https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'">
                 </div>
             </div>
             
             <div class="product-info">
-                <div class="product-category">Hai Swimwear</div>
+                <div class="brand-name">HAI SWIMWEAR</div>
                 <h1 class="product-title">{$producto['nombre']}</h1>
                 
                 <div class="product-price-section">
-                    <span class="product-price">\${$precio}</span>
-                    {$descuento}
+                    {$precioHTML}
+                    {$descuentoHTML}
                 </div>
                 
-                {$producto['descripcion_corta'] ? "<div class=\"product-description\"><p>{$producto['descripcion_corta']}</p></div>" : ''}
-                
-                <div class="product-stock">
-                    <span class="stock-indicator " . ($stock === 0 ? 'out' : ($stock < 10 ? 'low' : '')) . "\"></span>
-                    <span>" . ($stock === 0 ? 'Agotado' : ($stock < 10 ? "Solo quedan {$stock} unidades" : 'Disponible')) . "</span>
+                <div class="availability {$availabilityClass}">
+                    <span class="dot"></span>
+                    <span>{$availabilityText}</span>
                 </div>
                 
                 <div class="product-actions">
-                    <button class="btn-add-cart" " . ($stock === 0 ? 'disabled' : '') . ">
-                        " . ($stock === 0 ? 'AGOTADO' : 'AGREGAR AL CARRITO') . "
-                    </button>
-                    <button class=\"btn-whatsapp\" onclick=\"contactWhatsApp()\">
-                        CONSULTAR
+                    <button class="btn-add-cart" onclick="contactWhatsApp()">
+                        CONSULTAR DISPONIBILIDAD
                     </button>
                 </div>
                 
-                <div class="product-specs">
-                    <h3 style="margin-bottom: 20px; font-size: 20px;">Especificaciones</h3>
-                    " . ($producto['sku'] ? "<div class=\"spec-row\"><span class=\"spec-label\">SKU:</span><span class=\"spec-value\">{$producto['sku']}</span></div>" : '') . "
-                    " . ($producto['dimensiones'] ? "<div class=\"spec-row\"><span class=\"spec-label\">Dimensiones:</span><span class=\"spec-value\">{$producto['dimensiones']}</span></div>" : '') . "
-                    " . ($producto['peso'] ? "<div class=\"spec-row\"><span class=\"spec-label\">Peso:</span><span class=\"spec-value\">{$producto['peso']} kg</span></div>" : '') . "
-                    <div class=\"spec-row\">
-                        <span class=\"spec-label\">Stock:</span>
-                        <span class=\"spec-value\">{$stock} unidades</span>
+                <div class="specs-section">
+                    <h3 class="specs-title">Especificaciones</h3>
+                    {$skuHTML}
+                    <div class="spec-item">
+                        <span class="spec-label">Descripción</span>
+                    </div>
+                    <div style="margin-top: 10px; color: #666; line-height: 1.6;">
+                        {$producto['descripcion_corta']}
                     </div>
                 </div>
             </div>
@@ -476,32 +518,15 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
             <div class="footer-content">
                 <div class="footer-section">
                     <h3 class="footer-logo">Hai Swimwear</h3>
-                    <p>Trajes de baño diseñados especialmente para mujeres con busto grande. Comodidad, estilo y soporte perfecto.</p>
+                    <p>Trajes de baño diseñados especialmente para mujeres con busto grande.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Información</h4>
                     <ul>
                         <li><a href="../index.html#tallas">Guía de Tallas</a></li>
                         <li><a href="../index.html#envios">Envíos y Devoluciones</a></li>
-                        <li><a href="../index.html#preguntas">Preguntas Frecuentes</a></li>
                         <li><a href="../index.html#contacto">Contacto</a></li>
                     </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#terminos">Términos y Condiciones</a></li>
-                        <li><a href="#privacidad">Política de Privacidad</a></li>
-                        <li><a href="#cambios">Política de Cambios</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Síguenos</h4>
-                    <div class="social-links">
-                        <a href="#" aria-label="Instagram">Instagram</a>
-                        <a href="#" aria-label="Facebook">Facebook</a>
-                        <a href="#" aria-label="TikTok">TikTok</a>
-                    </div>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -511,6 +536,12 @@ function generarHTMLProducto($producto, $slug, $imagenUrl, $descuento) {
     </footer>
 
     <script>
+        function changeImage(element, src) {
+            document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
         function contactWhatsApp() {
             const message = encodeURIComponent('Hola! Estoy interesado/a en el producto: {$producto['nombre']}');
             window.open('https://wa.me/56912345678?text=' + message, '_blank');

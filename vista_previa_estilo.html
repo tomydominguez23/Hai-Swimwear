@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa de Estilo - Hai Swimwear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Top Bar */
+        .top-info-bar {
+            background-color: #000;
+            color: white;
+            padding: 10px 0;
+            font-size: 12px;
+            text-align: center;
+        }
+        .top-info-bar .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Nav (Simplified) */
+        .main-nav {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        /* Product Detail */
+        .product-detail-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+        
+        .breadcrumb {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .product-detail-grid {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+        
+        /* Gallery Styles */
+        .product-gallery {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .thumbnails-col {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 3/4;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: #f0f0f0;
+        }
+        
+        .thumbnail.active {
+            border-color: #000;
+            border-width: 2px;
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .main-image-col {
+            flex: 1;
+            aspect-ratio: 3/4;
+            background: #f8f8f8;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .main-image-col img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Product Info Styles */
+        .product-info {
+            padding-top: 20px;
+        }
+        
+        .brand-name {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        
+        .product-price-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .price-current {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .price-original {
+            font-size: 18px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .discount-badge {
+            background: #e63946;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .availability {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .available .dot { background: #4CAF50; }
+        
+        /* Actions */
+        .product-actions {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .btn-add-cart {
+            background: #25D366;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-align: center;
+        }
+        
+        .specs-section {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+        
+        .specs-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f9f9f9;
+            font-size: 14px;
+        }
+        
+        .spec-label { color: #666; }
+        .spec-value { font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="top-info-bar">
+        <div class="container">
+            <span>PAGA EN 12 CUOTAS SIN INTERÉS</span>
+            <span>Envío RM a $3.490</span>
+            <span>RETIRO EN TIENDA GRATIS</span>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <div class="container">
+            <h1 class="logo-text">Hai Swimwear</h1>
+        </div>
+    </nav>
+
+    <div class="product-detail-container">
+        <div class="breadcrumb">
+            Home / Productos / Bikini de Prueba
+        </div>
+        
+        <div class="product-detail-grid">
+            <div class="product-gallery">
+                <div class="thumbnails-col">
+                    <div class="thumbnail active">
+                        <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=200&q=80" alt="Thumb">
+                    </div>
+                    <div class="thumbnail">
+                        <img src="https://images.unsplash.com/photo-1544194215-541c2d3561a4?auto=format&fit=crop&w=200&q=80" alt="Thumb">
+                    </div>
+                </div>
+                <div class="main-image-col">
+                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80" alt="Bikini">
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <div class="brand-name">HAI SWIMWEAR</div>
+                <h1 class="product-title">Bikini Soporte Máximo</h1>
+                
+                <div class="product-price-section">
+                    <span class="price-current">$24.990</span>
+                    <span class="price-original">$32.990</span>
+                    <span class="discount-badge">-24%</span>
+                </div>
+                
+                <div class="availability available">
+                    <span class="dot"></span>
+                    <span>Disponible (10 unidades)</span>
+                </div>
+                
+                <div class="product-actions">
+                    <button class="btn-add-cart">
+                        CONSULTAR DISPONIBILIDAD
+                    </button>
+                </div>
+                
+                <div class="specs-section">
+                    <h3 class="specs-title">Especificaciones</h3>
+                    <div class="spec-item">
+                        <span class="spec-label">SKU</span>
+                        <span class="spec-value">HAI-BIK-001</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Material</span>
+                        <span class="spec-value">Lycra Premium</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
