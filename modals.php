@@ -102,19 +102,20 @@
                     <input type="file" multiple accept="image/*" id="uploadImagesInput" name="imagen">
                 </div>
                 <div class="form-group">
-                    <label>¿Dónde quieres usar esta imagen?</label>
-                    <select class="form-control" id="imageLocation">
-                        <option value="galeria">Galería (Recomendado)</option>
+                    <label>Tipo de imagen:</label>
+                    <select class="form-control" id="imageLocation" name="tipo">
+                        <option value="galeria">Galería (General)</option>
                         <option value="logo">Logo Principal</option>
                         <option value="banner">Banner Principal</option>
+                        <option value="slider">Slider / Carrusel</option>
                         <option value="fondo">Fondo de Sección</option>
+                        <option value="icono">Icono</option>
                     </select>
                 </div>
-                <div class="form-group" id="sectionSelect" style="display: none;">
-                    <label>Selecciona la sección específica:</label>
-                    <select class="form-control">
-                        <option value="">Seleccionar sección...</option>
-                    </select>
+                <div class="form-group">
+                    <label>Ubicación específica (opcional):</label>
+                    <input type="text" class="form-control" name="ubicacion" placeholder="Ej: home_top, footer, pagina_contacto">
+                    <small class="form-text text-muted">Usa esto para identificar exactamente dónde poner la imagen en el código.</small>
                 </div>
                 <div class="form-group">
                     <label>Título:</label>
