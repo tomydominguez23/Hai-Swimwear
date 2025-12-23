@@ -1388,7 +1388,7 @@ function displayImages(images) {
                     <button class="btn-icon" title="Copiar URL" onclick="copyToClipboard('${img.url}')">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <button class="btn-icon danger" title="Eliminar">
+                    <button class="btn-icon danger" title="Eliminar" onclick="deleteImage(${img.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -1432,6 +1432,33 @@ async function deleteProduct(id) {
     } catch (error) {
         console.error('Error:', error);
         showNotification('Error al eliminar producto', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function deleteImage(id) {
+    if (!confirm('¿Estás seguro de eliminar esta imagen? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const response = await fetch(`${API_URL}?action=imagenes&id=${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Imagen eliminada correctamente', 'success');
+            loadImages(); // Recargar la grilla
+        } else {
+            showNotification('Error al eliminar: ' + result.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al eliminar imagen', 'error');
     } finally {
         showLoading(false);
     }
