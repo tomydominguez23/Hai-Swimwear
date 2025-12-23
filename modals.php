@@ -102,20 +102,78 @@
                     <input type="file" multiple accept="image/*" id="uploadImagesInput" name="imagen">
                 </div>
                 <div class="form-group">
-                    <label>¿Dónde quieres usar esta imagen?</label>
-                    <select class="form-control" id="imageLocation">
-                        <option value="galeria">Galería (Recomendado)</option>
-                        <option value="logo">Logo Principal</option>
-                        <option value="banner">Banner Principal</option>
-                        <option value="fondo">Fondo de Sección</option>
+                    <label>Tipo de imagen:</label>
+                    <select class="form-control" id="imageTypeSelect" name="tipo" onchange="toggleLocationSelects()">
+                        <option value="galeria">Galería (General)</option>
+                        <option value="banner">Banner</option>
+                        <option value="logo">Logo</option>
+                        <option value="slider">Slider / Carrusel</option>
+                        <option value="fondo">Fondo</option>
+                        <option value="icono">Icono</option>
                     </select>
                 </div>
-                <div class="form-group" id="sectionSelect" style="display: none;">
-                    <label>Selecciona la sección específica:</label>
-                    <select class="form-control">
-                        <option value="">Seleccionar sección...</option>
+
+                <!-- Selector Específico para Banners -->
+                <div class="form-group" id="bannerLocationsGroup" style="display: none;">
+                    <label>¿En qué sección va este Banner? *</label>
+                    <select class="form-control" id="bannerLocationSelect">
+                        <option value="">Selecciona una ubicación...</option>
+                        <option value="home_principal">Portada Principal (Home)</option>
+                        <option value="home_secundario">Secundario (Home)</option>
+                        <option value="categorias_header">Cabecera de Categorías</option>
+                        <option value="ofertas_especiales">Sección Ofertas</option>
+                        <option value="footer_promo">Promoción en Footer</option>
                     </select>
                 </div>
+
+                <!-- Campo oculto para enviar la ubicación final -->
+                <input type="hidden" name="ubicacion" id="finalLocationInput">
+
+                <div class="form-group" id="manualLocationGroup">
+                    <label>Ubicación específica (opcional):</label>
+                    <input type="text" class="form-control" id="manualLocationInput" placeholder="Ej: home_top, footer">
+                    <small class="form-text text-muted">Deja esto vacío si usaste el selector de arriba.</small>
+                </div>
+
+                <script>
+                    function toggleLocationSelects() {
+                        const type = document.getElementById('imageTypeSelect').value;
+                        const bannerGroup = document.getElementById('bannerLocationsGroup');
+                        const manualGroup = document.getElementById('manualLocationGroup');
+                        const finalInput = document.getElementById('finalLocationInput');
+                        const bannerSelect = document.getElementById('bannerLocationSelect');
+
+                        // Resetear valores
+                        bannerSelect.value = "";
+                        
+                        if (type === 'banner') {
+                            bannerGroup.style.display = 'block';
+                            manualGroup.style.display = 'none';
+                        } else {
+                            bannerGroup.style.display = 'none';
+                            manualGroup.style.display = 'block';
+                        }
+                    }
+
+                    // Antes de enviar, asegurar que el valor correcto vaya al campo 'ubicacion'
+                    document.getElementById('uploadImagesForm').addEventListener('submit', function(e) {
+                        const type = document.getElementById('imageTypeSelect').value;
+                        const bannerVal = document.getElementById('bannerLocationSelect').value;
+                        const manualVal = document.getElementById('manualLocationInput').value;
+                        const finalInput = document.getElementById('finalLocationInput');
+
+                        if (type === 'banner') {
+                            if (!bannerVal) {
+                                e.preventDefault();
+                                alert('Por favor selecciona en qué sección va el banner.');
+                                return;
+                            }
+                            finalInput.value = bannerVal;
+                        } else {
+                            finalInput.value = manualVal;
+                        }
+                    });
+                </script>
                 <div class="form-group">
                     <label>Título:</label>
                     <input type="text" class="form-control" name="titulo" id="imagenTitulo" placeholder="Título de la imagen">

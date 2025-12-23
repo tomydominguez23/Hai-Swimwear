@@ -482,12 +482,8 @@ function handleImagenes($method) {
                 $sql .= " ORDER BY fecha_creacion DESC";
             }
             $imagenes = fetchAll($sql, $params);
-            // Agregar prefijo a las URLs si no lo tienen
-            foreach ($imagenes as &$img) {
-                if (!empty($img['url']) && strpos($img['url'], 'http') !== 0 && strpos($img['url'], '/') !== 0) {
-                    $img['url'] = '../' . $img['url'];
-                }
-            }
+            // No modificar las URLs aquí, dejar que el frontend maneje las rutas relativas o absolutas
+            // Esto evita problemas cuando admin.php y uploads/ están en el mismo nivel
             jsonResponse(true, 'Imágenes obtenidas', $imagenes);
             break;
             
@@ -528,27 +524,29 @@ function handleImagenes($method) {
             if (move_uploaded_file($_FILES['imagen']['tmp_name'], $filePath)) {
                 // Obtener datos del formulario
                 $tipo = $_POST['tipo'] ?? 'galeria';
+                $ubicacion = $_POST['ubicacion'] ?? null;
                 $titulo = $_POST['titulo'] ?? pathinfo($_FILES['imagen']['name'], PATHINFO_FILENAME);
                 $descripcion = $_POST['descripcion'] ?? null;
                 $altText = $_POST['alt_text'] ?? null;
                 
                 // Guardar en base de datos
                 if ($isPostgres) {
-                    $sql = "INSERT INTO imagenes_web (url, tipo, titulo, descripcion, alt_text) 
-                            VALUES ($1, $2, $3, $4, $5) RETURNING id";
+                    $sql = "INSERT INTO imagenes_web (url, tipo, ubicacion, titulo, descripcion, alt_text) 
+                            VALUES ($1, $2, $3, $4, $5, $6) RETURNING id";
                 } else {
-                    $sql = "INSERT INTO imagenes_web (url, tipo, titulo, descripcion, alt_text) 
-                            VALUES (?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO imagenes_web (url, tipo, ubicacion, titulo, descripcion, alt_text) 
+                            VALUES (?, ?, ?, ?, ?, ?)";
                 }
                 
                 $url = 'uploads/' . $fileName;
-                $id = insertAndGetId($sql, [$url, $tipo, $titulo, $descripcion, $altText]);
+                $id = insertAndGetId($sql, [$url, $tipo, $ubicacion, $titulo, $descripcion, $altText]);
                 
                 if ($id) {
                     jsonResponse(true, 'Imagen subida exitosamente', [
                         'id' => $id,
                         'url' => $url,
                         'tipo' => $tipo,
+                        'ubicacion' => $ubicacion,
                         'titulo' => $titulo
                     ]);
                 } else {
