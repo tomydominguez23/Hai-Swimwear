@@ -493,30 +493,30 @@ function handleImagenes($method) {
                 jsonResponse(false, 'No se recibió ninguna imagen', null);
             }
             
-            // Crear directorio de uploads si no existe
-            $uploadDir = '../uploads/';
+            // Crear directorio de uploads si no existe - USAR RUTA ABSOLUTA SEGURA
+            $uploadDir = __DIR__ . '/uploads/';
             if (!file_exists($uploadDir)) {
                 if (!mkdir($uploadDir, 0755, true)) {
                     jsonResponse(false, 'Error al crear directorio de uploads', null);
                 }
             }
             
-            // Validar tipo de archivo
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            $fileType = $_FILES['imagen']['type'];
+            // Validar extensión (más confiable que MIME type a veces)
+            $fileInfo = pathinfo($_FILES['imagen']['name']);
+            $extension = strtolower($fileInfo['extension'] ?? '');
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
             
-            if (!in_array($fileType, $allowedTypes)) {
+            if (!in_array($extension, $allowedExtensions)) {
                 jsonResponse(false, 'Tipo de archivo no permitido. Solo se permiten: JPEG, PNG, WebP, GIF', null);
             }
             
-            // Validar tamaño (máximo 5MB)
-            $maxSize = 5 * 1024 * 1024; // 5MB
+            // Validar tamaño (máximo 10MB para ser más flexible)
+            $maxSize = 10 * 1024 * 1024; // 10MB
             if ($_FILES['imagen']['size'] > $maxSize) {
-                jsonResponse(false, 'La imagen es demasiado grande. Máximo 5MB', null);
+                jsonResponse(false, 'La imagen es demasiado grande. Máximo 10MB', null);
             }
             
             // Generar nombre único
-            $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
             $fileName = uniqid() . '_' . time() . '.' . $extension;
             $filePath = $uploadDir . $fileName;
             
@@ -525,7 +525,7 @@ function handleImagenes($method) {
                 // Obtener datos del formulario
                 $tipo = $_POST['tipo'] ?? 'galeria';
                 $ubicacion = $_POST['ubicacion'] ?? null;
-                $titulo = $_POST['titulo'] ?? pathinfo($_FILES['imagen']['name'], PATHINFO_FILENAME);
+                $titulo = $_POST['titulo'] ?? $fileInfo['filename'];
                 $descripcion = $_POST['descripcion'] ?? null;
                 $altText = $_POST['alt_text'] ?? null;
                 
@@ -538,6 +538,7 @@ function handleImagenes($method) {
                             VALUES (?, ?, ?, ?, ?, ?)";
                 }
                 
+                // Guardar ruta relativa para la web
                 $url = 'uploads/' . $fileName;
                 $id = insertAndGetId($sql, [$url, $tipo, $ubicacion, $titulo, $descripcion, $altText]);
                 
@@ -556,6 +557,36 @@ function handleImagenes($method) {
                 }
             } else {
                 jsonResponse(false, 'Error al mover el archivo. Verifica permisos del directorio uploads/', null);
+            }
+            break;
+
+        case 'DELETE':
+            $id = $_GET['id'] ?? null;
+            if (!$id) {
+                jsonResponse(false, 'ID de imagen no especificado', null);
+            }
+
+            // Primero obtener la info de la imagen para borrar el archivo físico
+            if ($isPostgres) {
+                $img = fetchOne("SELECT url FROM imagenes_web WHERE id = $1", [$id]);
+            } else {
+                $img = fetchOne("SELECT url FROM imagenes_web WHERE id = ?", [$id]);
+            }
+
+            if ($img) {
+                // Intentar borrar archivo físico
+                $filePath = __DIR__ . '/' . $img['url'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                
+                // Borrar de BD
+                $sql = $isPostgres ? "DELETE FROM imagenes_web WHERE id = $1" : "DELETE FROM imagenes_web WHERE id = ?";
+                executeQuery($sql, [$id]);
+                
+                jsonResponse(true, 'Imagen eliminada correctamente', null);
+            } else {
+                jsonResponse(false, 'Imagen no encontrada', null);
             }
             break;
     }

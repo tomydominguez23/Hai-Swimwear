@@ -173,6 +173,9 @@
                             finalInput.value = manualVal;
                         }
                     });
+
+                    // Ejecutar al inicio para asegurar estado correcto
+                    document.addEventListener('DOMContentLoaded', toggleLocationSelects);
                 </script>
                 <div class="form-group">
                     <label>Título:</label>
