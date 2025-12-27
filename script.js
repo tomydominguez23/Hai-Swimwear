@@ -56,12 +56,7 @@ function initCarouselLogic() {
     indicators = document.querySelectorAll('.indicator');
     
     // Event listeners for carousel controls
-    // Removemos listeners antiguos clonando y reemplazando si es necesario, 
-    // pero como los botones son estáticos fuera del contenedor dinámico, está bien dejarlos.
-    // Solo aseguramos que los botones existan.
-
     if (nextBtn) {
-        // Usamos una propiedad personalizada para evitar listeners duplicados si llamamos init varias veces
         if (!nextBtn.hasAttribute('data-initialized')) {
             nextBtn.addEventListener('click', () => {
                 stopCarousel();
@@ -101,8 +96,8 @@ function initCarouselLogic() {
 // Carga dinámica de imágenes
 async function loadDynamicImages() {
     try {
-        // Cargar Logo
-        const logoResponse = await fetch('api.php?action=imagenes&tipo=logos');
+        // Cargar Logo (usamos 'logo' singular, según se guarda en DB)
+        const logoResponse = await fetch('api.php?action=imagenes&tipo=logo');
         const logoData = await logoResponse.json();
         
         if (logoData.success && logoData.data && logoData.data.length > 0) {
@@ -110,17 +105,54 @@ async function loadDynamicImages() {
             if (logoContainer) {
                 // Usamos el logo más reciente
                 const logo = logoData.data[0];
-                // Aseguramos que la URL sea correcta (asumiendo que 'uploads/' es accesible desde raíz)
                 const logoUrl = logo.url; 
-                logoContainer.innerHTML = `<img src="${logoUrl}" alt="Hai Swimwear" class="logo-image" style="max-height: 60px; width: auto;">`;
+                
+                // Verificar si la URL ya incluye ruta completa o no
+                // Si api devuelve "uploads/..." está bien.
+                logoContainer.innerHTML = `<a href="index.html" style="text-decoration:none;"><img src="${logoUrl}" alt="Hai Swimwear" class="logo-image" style="max-height: 80px; width: auto; display: block;"></a>`;
+            }
+        } else {
+            // Intentar con 'logos' (plural) por si acaso se usó antes
+            try {
+                 const logoResponseOld = await fetch('api.php?action=imagenes&tipo=logos');
+                 const logoDataOld = await logoResponseOld.json();
+                 if (logoDataOld.success && logoDataOld.data && logoDataOld.data.length > 0) {
+                     const logoContainer = document.getElementById('main-logo-container');
+                     if (logoContainer) {
+                         const logo = logoDataOld.data[0];
+                         logoContainer.innerHTML = `<a href="index.html" style="text-decoration:none;"><img src="${logo.url}" alt="Hai Swimwear" class="logo-image" style="max-height: 80px; width: auto; display: block;"></a>`;
+                     }
+                 }
+            } catch(e) {}
+        }
+
+        // Cargar Banners (usamos 'banner' singular)
+        const bannersResponse = await fetch('api.php?action=imagenes&tipo=banner');
+        const bannersData = await bannersResponse.json();
+        
+        let banners = [];
+        if (bannersData.success && bannersData.data) {
+            banners = bannersData.data;
+            
+            // Filtrar por ubicación si es necesario, priorizando 'home_principal'
+            const homeBanners = banners.filter(b => b.ubicacion === 'home_principal');
+            if (homeBanners.length > 0) {
+                banners = homeBanners;
             }
         }
 
-        // Cargar Banners
-        const bannersResponse = await fetch('api.php?action=imagenes&tipo=banners');
-        const bannersData = await bannersResponse.json();
+        // Si no hay banners con 'banner', intentar con 'banners' (plural legacy)
+        if (banners.length === 0) {
+            try {
+                const bannersResponseOld = await fetch('api.php?action=imagenes&tipo=banners');
+                const bannersDataOld = await bannersResponseOld.json();
+                if (bannersDataOld.success && bannersDataOld.data) {
+                    banners = bannersDataOld.data;
+                }
+            } catch(e) {}
+        }
 
-        if (bannersData.success && bannersData.data && bannersData.data.length > 0) {
+        if (banners.length > 0) {
             const carouselContainer = document.getElementById('hero-carousel-container');
             const indicatorsContainer = document.querySelector('.carousel-indicators');
             
@@ -128,7 +160,7 @@ async function loadDynamicImages() {
                 let slidesHtml = '';
                 let indicatorsHtml = '';
                 
-                bannersData.data.forEach((banner, index) => {
+                banners.forEach((banner, index) => {
                     const activeClass = index === 0 ? 'active' : '';
                     const bannerUrl = banner.url;
                     
@@ -201,175 +233,168 @@ if (searchInput) {
         if (e.key === 'Enter') {
             const searchTerm = this.value.trim();
             if (searchTerm) {
-                // Aquí puedes agregar la lógica de búsqueda
                 console.log('Buscando:', searchTerm);
-                // Ejemplo: window.location.href = `/buscar?q=${encodeURIComponent(searchTerm)}`;
             }
-        }
-    });
-}
-
-// Filter functionality
-const filterCheckboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
-const productCards = document.querySelectorAll('.product-card');
-
-function filterProducts() {
-    const activeFilters = {
-        tipo: [],
-        talla: [],
-        soporte: []
-    };
-
-    filterCheckboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            const filterGroup = checkbox.closest('.filter-group');
-            const groupTitle = filterGroup.querySelector('.filter-group-title').textContent.trim();
-            const filterValue = checkbox.nextElementSibling.textContent.trim();
-
-            if (groupTitle === 'Tipo') {
-                activeFilters.tipo.push(filterValue);
-            } else if (groupTitle === 'Talla') {
-                activeFilters.talla.push(filterValue);
-            } else if (groupTitle === 'Soporte') {
-                activeFilters.soporte.push(filterValue);
-            }
-        }
-    });
-
-    // Filtrar productos (ejemplo básico - puedes expandir esta lógica)
-    productCards.forEach(card => {
-        let shouldShow = true;
-        const productName = card.querySelector('.product-name').textContent.toLowerCase();
-
-        // Filtrar por tipo
-        if (activeFilters.tipo.length > 0) {
-            const matchesType = activeFilters.tipo.some(tipo => {
-                const tipoLower = tipo.toLowerCase();
-                return productName.includes(tipoLower) || 
-                       (tipoLower.includes('bikini') && productName.includes('bikini')) ||
-                       (tipoLower.includes('traje') && productName.includes('traje'));
-            });
-            if (!matchesType) shouldShow = false;
-        }
-
-        card.style.display = shouldShow ? 'block' : 'none';
-    });
-}
-
-filterCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', filterProducts);
-});
-
-// Sort functionality
-const sortSelect = document.querySelector('.sort-select');
-if (sortSelect) {
-    sortSelect.addEventListener('change', function() {
-        const sortValue = this.value;
-        const productsContainer = document.querySelector('.products-grid');
-        const products = Array.from(productCards);
-
-        products.sort((a, b) => {
-            const priceA = parseFloat(a.querySelector('.price-sale').textContent.replace(/[^0-9]/g, ''));
-            const priceB = parseFloat(b.querySelector('.price-sale').textContent.replace(/[^0-9]/g, ''));
-            const nameA = a.querySelector('.product-name').textContent;
-            const nameB = b.querySelector('.product-name').textContent;
-
-            switch(sortValue) {
-                case 'Precio: Menor a Mayor':
-                    return priceA - priceB;
-                case 'Precio: Mayor a Menor':
-                    return priceB - priceA;
-                case 'Nombre A-Z':
-                    return nameA.localeCompare(nameB);
-                case 'Nombre Z-A':
-                    return nameB.localeCompare(nameA);
-                default:
-                    return 0;
-            }
-        });
-
-        products.forEach(product => productsContainer.appendChild(product));
-    });
-}
-
-// CTA Button functionality
-const ctaButton = document.querySelector('.cta-button');
-if (ctaButton) {
-    ctaButton.addEventListener('click', function() {
-        const productsSection = document.getElementById('productos');
-        if (productsSection) {
-            productsSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+                }
             });
         }
-    });
-}
 
-// Product card click functionality
-productCards.forEach(card => {
-    card.addEventListener('click', function() {
-        const productName = this.querySelector('.product-name').textContent;
-        console.log('Producto seleccionado:', productName);
-        // Aquí puedes agregar la lógica para abrir el detalle del producto
-        // Ejemplo: window.location.href = `/producto/${encodeURIComponent(productName)}`;
-    });
-});
+        // Filter functionality
+        const filterCheckboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+        const productCards = document.querySelectorAll('.product-card');
 
-// Navbar scroll effect
-let lastScroll = 0;
-const navbar = document.querySelector('.main-nav');
+        function filterProducts() {
+            const activeFilters = {
+                tipo: [],
+                talla: [],
+                soporte: []
+            };
 
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > 100) {
-        navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
-    } else {
-        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-    }
-    
-    lastScroll = currentScroll;
-});
+            filterCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const filterGroup = checkbox.closest('.filter-group');
+                    const groupTitle = filterGroup.querySelector('.filter-group-title').textContent.trim();
+                    const filterValue = checkbox.nextElementSibling.textContent.trim();
 
-// Mobile menu toggle (para futuras mejoras)
-function initMobileMenu() {
-    const navLinks = document.querySelector('.nav-links');
-    const navRight = document.querySelector('.nav-right');
-    
-    // Crear botón de menú móvil si no existe
-    if (window.innerWidth <= 768 && !document.querySelector('.mobile-menu-toggle')) {
-        const menuToggle = document.createElement('button');
-        menuToggle.className = 'mobile-menu-toggle';
-        menuToggle.innerHTML = '☰';
-        menuToggle.style.cssText = 'background: none; border: none; color: white; font-size: 24px; cursor: pointer;';
-        
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('mobile-open');
-            navRight.classList.toggle('mobile-open');
+                    if (groupTitle === 'Tipo') {
+                        activeFilters.tipo.push(filterValue);
+                    } else if (groupTitle === 'Talla') {
+                        activeFilters.talla.push(filterValue);
+                    } else if (groupTitle === 'Soporte') {
+                        activeFilters.soporte.push(filterValue);
+                    }
+                }
+            });
+
+            productCards.forEach(card => {
+                let shouldShow = true;
+                const productName = card.querySelector('.product-name').textContent.toLowerCase();
+
+                if (activeFilters.tipo.length > 0) {
+                    const matchesType = activeFilters.tipo.some(tipo => {
+                        const tipoLower = tipo.toLowerCase();
+                        return productName.includes(tipoLower) || 
+                               (tipoLower.includes('bikini') && productName.includes('bikini')) ||
+                               (tipoLower.includes('traje') && productName.includes('traje'));
+                    });
+                    if (!matchesType) shouldShow = false;
+                }
+
+                card.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        filterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filterProducts);
         });
-        
-        const navLeft = document.querySelector('.nav-left');
-        navLeft.appendChild(menuToggle);
-    }
-}
 
-// Initialize on load
-window.addEventListener('load', () => {
-    initMobileMenu();
-    loadDynamicImages(); // Inicia la carga dinámica de imágenes y luego el carrusel
-});
+        // Sort functionality
+        const sortSelect = document.querySelector('.sort-select');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                const productsContainer = document.querySelector('.products-grid');
+                const products = Array.from(productCards);
 
-// Reinitialize on resize
-window.addEventListener('resize', () => {
-    initMobileMenu();
-});
+                products.sort((a, b) => {
+                    const priceA = parseFloat(a.querySelector('.price-sale').textContent.replace(/[^0-9]/g, ''));
+                    const priceB = parseFloat(b.querySelector('.price-sale').textContent.replace(/[^0-9]/g, ''));
+                    const nameA = a.querySelector('.product-name').textContent;
+                    const nameB = b.querySelector('.product-name').textContent;
 
-// Add loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s';
-        document.body.style.opacity = '1';
-    }, 100);
-});
+                    switch(sortValue) {
+                        case 'Precio: Menor a Mayor':
+                            return priceA - priceB;
+                        case 'Precio: Mayor a Menor':
+                            return priceB - priceA;
+                        case 'Nombre A-Z':
+                            return nameA.localeCompare(nameB);
+                        case 'Nombre Z-A':
+                            return nameB.localeCompare(nameA);
+                        default:
+                            return 0;
+                    }
+                });
+
+                products.forEach(product => productsContainer.appendChild(product));
+            });
+        }
+
+        // CTA Button functionality
+        const ctaButton = document.querySelector('.cta-button');
+        if (ctaButton) {
+            ctaButton.addEventListener('click', function() {
+                const productsSection = document.getElementById('productos');
+                if (productsSection) {
+                    productsSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        }
+
+        // Product card click functionality
+        productCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const productName = this.querySelector('.product-name').textContent;
+                console.log('Producto seleccionado:', productName);
+            });
+        });
+
+        // Navbar scroll effect
+        let lastScroll = 0;
+        const navbar = document.querySelector('.main-nav');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+            } else {
+                navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // Mobile menu toggle
+        function initMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            const navRight = document.querySelector('.nav-right');
+            
+            if (window.innerWidth <= 768 && !document.querySelector('.mobile-menu-toggle')) {
+                const menuToggle = document.createElement('button');
+                menuToggle.className = 'mobile-menu-toggle';
+                menuToggle.innerHTML = '☰';
+                menuToggle.style.cssText = 'background: none; border: none; color: white; font-size: 24px; cursor: pointer;';
+                
+                menuToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('mobile-open');
+                    navRight.classList.toggle('mobile-open');
+                });
+                
+                const navLeft = document.querySelector('.nav-left');
+                navLeft.appendChild(menuToggle);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initMobileMenu();
+            loadDynamicImages(); // Inicia la carga dinámica de imágenes y luego el carrusel
+        });
+
+        // Reinitialize on resize
+        window.addEventListener('resize', () => {
+            initMobileMenu();
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
