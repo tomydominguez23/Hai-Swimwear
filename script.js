@@ -1,12 +1,16 @@
 // Hero Carousel Functionality
 let currentSlide = 0;
 let carouselInterval;
-const slides = document.querySelectorAll('.carousel-slide');
-const indicators = document.querySelectorAll('.indicator');
+let slides = document.querySelectorAll('.carousel-slide');
+let indicators = document.querySelectorAll('.indicator');
 const prevBtn = document.querySelector('.carousel-btn-prev');
 const nextBtn = document.querySelector('.carousel-btn-next');
 
 function showSlide(index) {
+    // Actualizar referencias por si el DOM cambió
+    slides = document.querySelectorAll('.carousel-slide');
+    indicators = document.querySelectorAll('.indicator');
+
     // Remove active class from all slides and indicators
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
@@ -23,60 +27,155 @@ function showSlide(index) {
 }
 
 function nextSlide() {
+    slides = document.querySelectorAll('.carousel-slide');
+    if (slides.length === 0) return;
     const next = (currentSlide + 1) % slides.length;
     showSlide(next);
 }
 
 function prevSlide() {
+    slides = document.querySelectorAll('.carousel-slide');
+    if (slides.length === 0) return;
     const prev = (currentSlide - 1 + slides.length) % slides.length;
     showSlide(prev);
 }
 
 function startCarousel() {
-    carouselInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+    stopCarousel(); // Asegurar que no haya múltiples intervalos
+    if (document.querySelectorAll('.carousel-slide').length > 1) {
+        carouselInterval = setInterval(nextSlide, 5000);
+    }
 }
 
 function stopCarousel() {
-    clearInterval(carouselInterval);
+    if (carouselInterval) clearInterval(carouselInterval);
 }
 
-// Event listeners for carousel controls
-if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-        stopCarousel();
-        nextSlide();
+function initCarouselLogic() {
+    slides = document.querySelectorAll('.carousel-slide');
+    indicators = document.querySelectorAll('.indicator');
+    
+    // Event listeners for carousel controls
+    // Removemos listeners antiguos clonando y reemplazando si es necesario, 
+    // pero como los botones son estáticos fuera del contenedor dinámico, está bien dejarlos.
+    // Solo aseguramos que los botones existan.
+
+    if (nextBtn) {
+        // Usamos una propiedad personalizada para evitar listeners duplicados si llamamos init varias veces
+        if (!nextBtn.hasAttribute('data-initialized')) {
+            nextBtn.addEventListener('click', () => {
+                stopCarousel();
+                nextSlide();
+                startCarousel();
+            });
+            nextBtn.setAttribute('data-initialized', 'true');
+        }
+    }
+
+    if (prevBtn) {
+        if (!prevBtn.hasAttribute('data-initialized')) {
+            prevBtn.addEventListener('click', () => {
+                stopCarousel();
+                prevSlide();
+                startCarousel();
+            });
+            prevBtn.setAttribute('data-initialized', 'true');
+        }
+    }
+
+    // Pause carousel on hover
+    const carousel = document.querySelector('.hero-carousel');
+    if (carousel && !carousel.hasAttribute('data-initialized')) {
+        carousel.addEventListener('mouseenter', stopCarousel);
+        carousel.addEventListener('mouseleave', startCarousel);
+        carousel.setAttribute('data-initialized', 'true');
+    }
+
+    // Initialize carousel
+    if (slides.length > 0) {
+        showSlide(0);
         startCarousel();
-    });
+    }
 }
 
-if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-        stopCarousel();
-        prevSlide();
-        startCarousel();
-    });
-}
+// Carga dinámica de imágenes
+async function loadDynamicImages() {
+    try {
+        // Cargar Logo
+        const logoResponse = await fetch('api.php?action=imagenes&tipo=logos');
+        const logoData = await logoResponse.json();
+        
+        if (logoData.success && logoData.data && logoData.data.length > 0) {
+            const logoContainer = document.getElementById('main-logo-container');
+            if (logoContainer) {
+                // Usamos el logo más reciente
+                const logo = logoData.data[0];
+                // Aseguramos que la URL sea correcta (asumiendo que 'uploads/' es accesible desde raíz)
+                const logoUrl = logo.url; 
+                logoContainer.innerHTML = `<img src="${logoUrl}" alt="Hai Swimwear" class="logo-image" style="max-height: 60px; width: auto;">`;
+            }
+        }
 
-// Event listeners for indicators
-indicators.forEach((indicator, index) => {
-    indicator.addEventListener('click', () => {
-        stopCarousel();
-        showSlide(index);
-        startCarousel();
-    });
-});
+        // Cargar Banners
+        const bannersResponse = await fetch('api.php?action=imagenes&tipo=banners');
+        const bannersData = await bannersResponse.json();
 
-// Pause carousel on hover
-const carousel = document.querySelector('.hero-carousel');
-if (carousel) {
-    carousel.addEventListener('mouseenter', stopCarousel);
-    carousel.addEventListener('mouseleave', startCarousel);
-}
+        if (bannersData.success && bannersData.data && bannersData.data.length > 0) {
+            const carouselContainer = document.getElementById('hero-carousel-container');
+            const indicatorsContainer = document.querySelector('.carousel-indicators');
+            
+            if (carouselContainer) {
+                let slidesHtml = '';
+                let indicatorsHtml = '';
+                
+                bannersData.data.forEach((banner, index) => {
+                    const activeClass = index === 0 ? 'active' : '';
+                    const bannerUrl = banner.url;
+                    
+                    // Construir slide
+                    slidesHtml += `
+                        <div class="carousel-slide ${activeClass}" style="background-image: url('${bannerUrl}');">
+                            <div class="hero-content">
+                                <h2 class="hero-title">${banner.titulo || 'Hai Swimwear'}</h2>
+                                <p class="hero-subtitle">${banner.descripcion || 'Colección Exclusiva'}</p>
+                                <p class="hero-cta">Descubre más</p>
+                                <button class="cta-button" onclick="window.location.href='productos.html'">VER COLECCIÓN</button>
+                            </div>
+                            <div class="hero-overlay"></div>
+                        </div>
+                    `;
+                    
+                    // Construir indicador
+                    indicatorsHtml += `
+                        <button class="indicator ${activeClass}" data-slide="${index}" aria-label="Slide ${index + 1}"></button>
+                    `;
+                });
 
-// Initialize carousel
-if (slides.length > 0) {
-    showSlide(0);
-    startCarousel();
+                carouselContainer.innerHTML = slidesHtml;
+                
+                if (indicatorsContainer) {
+                    indicatorsContainer.innerHTML = indicatorsHtml;
+                    // Re-adjuntar eventos a los nuevos indicadores
+                    const newIndicators = indicatorsContainer.querySelectorAll('.indicator');
+                    newIndicators.forEach((indicator, index) => {
+                        indicator.addEventListener('click', () => {
+                            stopCarousel();
+                            showSlide(index);
+                            startCarousel();
+                        });
+                    });
+                }
+            }
+        }
+
+        // Reinicializar lógica del carrusel con los nuevos elementos
+        initCarouselLogic();
+
+    } catch (error) {
+        console.error('Error cargando imágenes dinámicas:', error);
+        // Si falla, inicializamos con lo que haya (contenido estático original)
+        initCarouselLogic();
+    }
 }
 
 // Smooth scroll for navigation links
@@ -258,6 +357,7 @@ function initMobileMenu() {
 // Initialize on load
 window.addEventListener('load', () => {
     initMobileMenu();
+    loadDynamicImages(); // Inicia la carga dinámica de imágenes y luego el carrusel
 });
 
 // Reinitialize on resize
@@ -273,4 +373,3 @@ window.addEventListener('load', () => {
         document.body.style.opacity = '1';
     }, 100);
 });
-
