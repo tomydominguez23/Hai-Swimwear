@@ -251,10 +251,16 @@ function handleProductos($method) {
                 
                 jsonResponse(true, 'Producto obtenido', $producto);
             } else {
+                // Obtener parámetro para mostrar productos de prueba (solo admin)
+                $incluirPrueba = isset($_GET['incluir_prueba']) && $_GET['incluir_prueba'] === '1';
+                
+                $sqlWhere = $incluirPrueba ? "" : " WHERE (p.es_prueba = 0 OR p.es_prueba IS NULL)";
+                
                 $productos = fetchAll("SELECT p.*, c.nombre as categoria_nombre 
                                       FROM productos p 
-                                      LEFT JOIN categorias c ON p.categoria_id = c.id 
-                                      ORDER BY p.fecha_creacion DESC");
+                                      LEFT JOIN categorias c ON p.categoria_id = c.id" 
+                                      . $sqlWhere . 
+                                      " ORDER BY p.fecha_creacion DESC");
                 
                 // Cargar imágenes para cada producto
                 foreach ($productos as &$producto) {
@@ -290,11 +296,11 @@ function handleProductos($method) {
             }
             
             if ($isPostgres) {
-                $sql = "INSERT INTO productos (nombre, sku, slug, categoria_id, precio, precio_anterior, stock, descripcion_corta, dimensiones, peso, estado, producto_destacado) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id";
+                $sql = "INSERT INTO productos (nombre, sku, slug, categoria_id, precio, precio_anterior, stock, descripcion_corta, dimensiones, peso, estado, producto_destacado, es_prueba) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id";
             } else {
-                $sql = "INSERT INTO productos (nombre, sku, slug, categoria_id, precio, precio_anterior, stock, descripcion_corta, dimensiones, peso, estado, producto_destacado) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO productos (nombre, sku, slug, categoria_id, precio, precio_anterior, stock, descripcion_corta, dimensiones, peso, estado, producto_destacado, es_prueba) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             }
             
             $slug = slugify($data['nombre']);
@@ -310,7 +316,8 @@ function handleProductos($method) {
                 $data['dimensiones'] ?? null,
                 isset($data['peso']) ? floatval($data['peso']) : null,
                 $data['estado'] ?? 'activo',
-                isset($data['producto_destacado']) && $data['producto_destacado'] ? true : false
+                isset($data['producto_destacado']) && $data['producto_destacado'] ? true : false,
+                0 // es_prueba = 0 por defecto (producto real)
             ];
             
             $id = insertAndGetId($sql, $params);

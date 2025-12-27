@@ -33,7 +33,7 @@ try {
             $sql = "SELECT p.*, c.nombre as categoria_nombre, c.slug as categoria_slug 
                     FROM productos p 
                     LEFT JOIN categorias c ON p.categoria_id = c.id 
-                    WHERE 1=1";
+                    WHERE 1=1 AND (p.es_prueba = 0 OR p.es_prueba IS NULL)";
             
             $params = [];
             $paramCount = 0;

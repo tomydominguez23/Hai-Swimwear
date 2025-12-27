@@ -1,0 +1,212 @@
+════════════════════════════════════════════════════════════════════════════════
+    🎯 SISTEMA DE PRODUCTOS - MOSTRAR SOLO TUS PRODUCTOS
+    Hai Swimwear - Diciembre 2025
+════════════════════════════════════════════════════════════════════════════════
+
+✅ ¿QUÉ SE HA HECHO?
+
+He creado un sistema completo para que puedas:
+
+1. ✅ Mostrar SOLO tus productos reales en el sitio web público
+2. 🧪 Ocultar automáticamente productos de prueba/demo
+3. 🗑️ Eliminar fácilmente productos de prueba
+4. 📊 Ver todos tus productos en una interfaz clara
+
+════════════════════════════════════════════════════════════════════════════════
+    📋 PASOS PARA USAR EL SISTEMA
+════════════════════════════════════════════════════════════════════════════════
+
+PASO 1: INSTALAR EL SISTEMA
+────────────────────────────────────────────────────────────────────────────────
+
+Abre en tu navegador:
+👉 http://localhost/instalar_sistema_productos.php
+
+Este instalador:
+- ✅ Agregará campos necesarios a la base de datos
+- ✅ Creará índices para mejorar el rendimiento
+- ✅ Configurará todo automáticamente
+
+Simplemente haz clic en "🚀 Instalar Ahora" y espera a que termine.
+
+────────────────────────────────────────────────────────────────────────────────
+
+PASO 2: GESTIONAR PRODUCTOS
+────────────────────────────────────────────────────────────────────────────────
+
+Abre en tu navegador:
+👉 http://localhost/gestionar_productos_prueba.php
+
+Aquí verás:
+- 📋 Una tabla con TODOS tus productos
+- 📸 Imagen, nombre, precio, stock de cada producto
+- ☑️ Casillas para seleccionar productos
+
+Para eliminar productos de prueba:
+1. Marca las casillas de los productos que NO quieres (los de prueba)
+2. Haz clic en "🗑️ Eliminar Seleccionados"
+3. Confirma la acción
+4. ¡Listo! Los productos se eliminarán completamente
+
+CONSEJO: Usa "☑️ Seleccionar Todos" si quieres empezar desde cero.
+
+────────────────────────────────────────────────────────────────────────────────
+
+PASO 3: VERIFICAR CAMBIOS
+────────────────────────────────────────────────────────────────────────────────
+
+Después de eliminar productos de prueba:
+
+✅ Abre tu sitio web: http://localhost/index.html
+   - Solo verás los productos que NO eliminaste
+   - Los productos de prueba ya NO aparecen
+
+✅ Abre productos: http://localhost/productos.html
+   - Solo muestra productos reales
+
+✅ Panel de admin: http://localhost/admin.php
+   - Puedes gestionar tus productos normalmente
+
+════════════════════════════════════════════════════════════════════════════════
+    🎨 CÓMO FUNCIONA
+════════════════════════════════════════════════════════════════════════════════
+
+PRODUCTOS REALES (TUS PRODUCTOS)
+- Campo: es_prueba = 0 o NULL
+- ✅ Aparecen en el sitio web público
+- ✅ Aparecen en la API
+- ✅ Los puedes editar en el admin
+
+PRODUCTOS DE PRUEBA
+- Campo: es_prueba = 1
+- ❌ NO aparecen en el sitio web público
+- ❌ NO aparecen en la API
+- ⚠️ Están ocultos para visitantes
+
+NUEVOS PRODUCTOS
+- Se crean automáticamente con es_prueba = 0
+- ✅ Aparecen inmediatamente en el sitio web
+- ✅ Son productos reales desde el inicio
+
+════════════════════════════════════════════════════════════════════════════════
+    🗂️ ARCHIVOS CREADOS
+════════════════════════════════════════════════════════════════════════════════
+
+1. 📄 instalar_sistema_productos.php
+   - Instalador automático del sistema
+   - Agrega campos a la base de datos
+   - Interfaz amigable con paso a paso
+
+2. 📄 gestionar_productos_prueba.php
+   - Interfaz para ver TODOS los productos
+   - Permite seleccionar y eliminar productos
+   - Muestra información detallada
+
+3. 📄 actualizar_productos_usuario.sql
+   - Script SQL manual (si prefieres usarlo)
+   - Agrega campos: creado_por, es_prueba
+
+4. 📄 GUIA_PRODUCTOS_USUARIO.md
+   - Guía detallada del sistema
+   - Preguntas frecuentes
+   - Solución de problemas
+
+5. 📄 INSTRUCCIONES_PRODUCTOS_FINALES.txt
+   - Este archivo (resumen rápido)
+
+ARCHIVOS MODIFICADOS:
+- ✏️ productos.php - Filtra productos de prueba automáticamente
+- ✏️ api.php - Permite filtrar productos en el panel admin
+
+════════════════════════════════════════════════════════════════════════════════
+    ⚡ INICIO RÁPIDO (RESUMEN)
+════════════════════════════════════════════════════════════════════════════════
+
+1. Abre: http://localhost/instalar_sistema_productos.php
+   → Haz clic en "Instalar Ahora"
+
+2. Abre: http://localhost/gestionar_productos_prueba.php
+   → Selecciona productos de prueba
+   → Haz clic en "Eliminar Seleccionados"
+
+3. Abre: http://localhost/index.html
+   → Verifica que solo aparezcan tus productos reales
+
+¡ESO ES TODO! 🎉
+
+════════════════════════════════════════════════════════════════════════════════
+    💡 CONSEJOS Y RECOMENDACIONES
+════════════════════════════════════════════════════════════════════════════════
+
+✅ ANTES DE ELIMINAR:
+- Verifica que los productos seleccionados sean de prueba
+- Asegúrate de NO seleccionar tus productos reales
+- Haz una copia de seguridad de la BD si tienes dudas
+
+✅ IDENTIFICAR PRODUCTOS DE PRUEBA:
+- Nombres genéricos: "Bikini Azul", "Traje Negro"
+- Sin imágenes o con imágenes de ejemplo
+- Datos de prueba o placeholder
+- El producto "ejemplo-bikini-azul.html"
+
+✅ DESPUÉS DE ELIMINAR:
+- Los productos se eliminan PERMANENTEMENTE
+- Las imágenes físicas se borran del servidor
+- Las páginas HTML se eliminan
+- NO se puede deshacer
+
+════════════════════════════════════════════════════════════════════════════════
+    🆘 SOLUCIÓN DE PROBLEMAS
+════════════════════════════════════════════════════════════════════════════════
+
+❌ PROBLEMA: "Error de conexión a base de datos"
+✅ SOLUCIÓN:
+   - Verifica que MySQL esté corriendo
+   - Comprueba usuario y contraseña en config_mysql.php
+   - Asegúrate de que la base de datos existe
+
+❌ PROBLEMA: "Error al agregar campos"
+✅ SOLUCIÓN:
+   - Los campos pueden ya existir (esto es normal)
+   - Verifica permisos del usuario de MySQL
+   - Intenta ejecutar el SQL manualmente
+
+❌ PROBLEMA: "No aparece ningún producto"
+✅ SOLUCIÓN:
+   - Verifica que tengas productos en la BD
+   - Comprueba que los productos tengan estado 'activo'
+   - Asegúrate de que es_prueba = 0
+
+❌ PROBLEMA: "Siguen apareciendo productos de prueba"
+✅ SOLUCIÓN:
+   - Limpia caché del navegador (Ctrl + F5)
+   - Verifica que ejecutaste el instalador
+   - Comprueba que productos.php esté actualizado
+
+════════════════════════════════════════════════════════════════════════════════
+    📞 INFORMACIÓN ADICIONAL
+════════════════════════════════════════════════════════════════════════════════
+
+📚 Para más detalles, lee: GUIA_PRODUCTOS_USUARIO.md
+
+🔧 Para soporte técnico:
+   - Revisa los logs de PHP
+   - Comprueba la consola del navegador (F12)
+   - Verifica permisos de archivos y carpetas
+
+🎯 El sistema está diseñado para ser:
+   - Fácil de usar
+   - Seguro (confirmaciones antes de eliminar)
+   - Automático (filtra productos sin configuración manual)
+
+════════════════════════════════════════════════════════════════════════════════
+
+¡LISTO! 🚀 
+
+Tu sistema ahora está configurado para mostrar solo tus productos reales.
+
+Los visitantes de tu web NO verán productos de prueba.
+
+¡Disfruta de tu tienda de Hai Swimwear! 🏊‍♀️
+
+════════════════════════════════════════════════════════════════════════════════
