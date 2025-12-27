@@ -492,6 +492,21 @@ function handleImagenes($method) {
             if (!isset($_FILES['imagen'])) {
                 jsonResponse(false, 'No se recibió ninguna imagen', null);
             }
+
+            // Verificar errores de subida
+            if ($_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+                $uploadErrorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por el servidor',
+                    UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo permitido por el formulario',
+                    UPLOAD_ERR_PARTIAL => 'El archivo solo se subió parcialmente',
+                    UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Falta la carpeta temporal',
+                    UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo en el disco',
+                    UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida',
+                ];
+                $errorMessage = $uploadErrorMessages[$_FILES['imagen']['error']] ?? 'Error desconocido al subir archivo';
+                jsonResponse(false, $errorMessage, null);
+            }
             
             // Crear directorio de uploads si no existe - USAR RUTA ABSOLUTA SEGURA
             $uploadDir = __DIR__ . '/uploads/';
@@ -504,16 +519,17 @@ function handleImagenes($method) {
             // Validar extensión (más confiable que MIME type a veces)
             $fileInfo = pathinfo($_FILES['imagen']['name']);
             $extension = strtolower($fileInfo['extension'] ?? '');
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            // Lista ampliada de extensiones permitidas
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp', 'tiff', 'ico'];
             
             if (!in_array($extension, $allowedExtensions)) {
-                jsonResponse(false, 'Tipo de archivo no permitido. Solo se permiten: JPEG, PNG, WebP, GIF', null);
+                jsonResponse(false, "Tipo de archivo no permitido. Detectado: '$extension'. Permitidos: " . implode(', ', $allowedExtensions), null);
             }
             
-            // Validar tamaño (máximo 10MB para ser más flexible)
-            $maxSize = 10 * 1024 * 1024; // 10MB
+            // Validar tamaño (máximo 15MB para ser más flexible)
+            $maxSize = 15 * 1024 * 1024; // 15MB
             if ($_FILES['imagen']['size'] > $maxSize) {
-                jsonResponse(false, 'La imagen es demasiado grande. Máximo 10MB', null);
+                jsonResponse(false, 'La imagen es demasiado grande. Máximo 15MB', null);
             }
             
             // Generar nombre único
@@ -814,4 +830,3 @@ function handleUploadProductImages($method) {
 }
 
 ?>
-
